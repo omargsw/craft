@@ -65,7 +65,7 @@ class _LoginPageState extends State<LoginPage> {
                     ),
                     Text(
                       "LOGIN",
-                      style: AppFonts.tajawal20WhiteW600,
+                      style: AppFonts.tajawal25WhiteW600,
                     ),
                     const SizedBox(
                       height: 30,

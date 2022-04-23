@@ -28,7 +28,9 @@ class _HomePageState extends State<HomePage> {
           itemBuilder: (_, index) {
             return GestureDetector(
               onTap: () {
-                Get.to(const PostsPage());
+                Get.to(const PostsPage(
+                  titlePage: "title",
+                ));
               },
               child: Padding(
                 padding: const EdgeInsets.all(8),

@@ -57,7 +57,7 @@ class _SignUpPageState extends State<SignUpPage> {
                     ),
                     Text(
                       "SIGNUP",
-                      style: AppFonts.tajawal20WhiteW600,
+                      style: AppFonts.tajawal25WhiteW600,
                     ),
                     const SizedBox(
                       height: 30,

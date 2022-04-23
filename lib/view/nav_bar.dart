@@ -1,6 +1,7 @@
 import 'package:craft/components/color.dart';
 import 'package:craft/components/font.dart';
 import 'package:craft/view/home_page.dart';
+import 'package:craft/view/profile_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
@@ -27,7 +28,7 @@ class _NavBarState extends State<NavBar> {
       const HomePage(),
       const HomePage(),
       const HomePage(),
-      const HomePage(),
+      const ProfileScreen(),
     ];
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
