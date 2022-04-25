@@ -15,8 +15,20 @@ class AppFonts {
     fontWeight: FontWeight.w600,
   );
 
+  static TextStyle tajawal20BlackW600 = GoogleFonts.tajawal(
+    fontSize: 20,
+    color: Colors.black,
+    fontWeight: FontWeight.w600,
+  );
+
   static TextStyle tajawal25PrimaryW600 = GoogleFonts.tajawal(
     fontSize: 25,
+    color: AppColors.primaryColor,
+    fontWeight: FontWeight.w600,
+  );
+
+  static TextStyle tajawal20PrimaryW600 = GoogleFonts.tajawal(
+    fontSize: 20,
     color: AppColors.primaryColor,
     fontWeight: FontWeight.w600,
   );
@@ -37,6 +49,18 @@ class AppFonts {
     fontSize: 16,
     color: Colors.black,
     fontWeight: FontWeight.w600,
+  );
+
+  static TextStyle tajawal16SecondaryW600 = GoogleFonts.tajawal(
+    fontSize: 16,
+    color: AppColors.secondaryColor,
+    fontWeight: FontWeight.w600,
+  );
+
+  static TextStyle tajawal14Black45W400 = GoogleFonts.tajawal(
+    fontSize: 14,
+    color: Colors.black54,
+    fontWeight: FontWeight.w400,
   );
 
   static TextStyle tajawal16PrimapryW600 = GoogleFonts.tajawal(

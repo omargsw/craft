@@ -26,7 +26,7 @@ class PrimaryButton extends StatelessWidget {
         child: Center(
           child: Text(
             title,
-            style: AppFonts.tajawal16WhiteW600,
+            style: AppFonts.tajawal20PrimaryW600,
             textAlign: TextAlign.center,
           ),
         ),

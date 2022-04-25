@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:craft/components/color.dart';
 import 'package:craft/components/primary_button.dart';
+import 'package:craft/components/text_field_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
@@ -13,13 +14,16 @@ class ProfileScreen extends StatefulWidget {
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
-  GlobalKey<FormState> form = GlobalKey<FormState>();
-  var name = TextEditingController();
-  var phone = TextEditingController();
-  var email = TextEditingController();
-  var pass = TextEditingController();
-  var pass2 = TextEditingController();
-  var pass3 = TextEditingController();
+  GlobalKey<FormState> formName = GlobalKey<FormState>();
+  GlobalKey<FormState> formEmail = GlobalKey<FormState>();
+  GlobalKey<FormState> formPhone = GlobalKey<FormState>();
+  GlobalKey<FormState> formPass = GlobalKey<FormState>();
+  GlobalKey<FormState> formPass2 = GlobalKey<FormState>();
+  TextEditingController name = TextEditingController();
+  TextEditingController email = TextEditingController();
+  TextEditingController phone = TextEditingController();
+  TextEditingController pass1 = TextEditingController();
+  TextEditingController pass2 = TextEditingController();
   bool ob = true, ob2 = true, ob3 = true;
   var confpass;
   Icon iconpass = Icon(Icons.visibility, color: AppColors.primaryColor);
@@ -156,7 +160,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Widget build(BuildContext context) {
     double width = MediaQuery.of(context).size.width;
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.primaryColor,
       body: Container(
         padding: const EdgeInsets.only(left: 16, top: 25, right: 16),
         child: ListView.builder(
@@ -292,99 +296,135 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
-                    Form(
-                        key: form,
-                        child: Padding(
-                          padding: const EdgeInsets.all(15.0),
-                          child: Column(
-                            children: [
-                              // TextFieldWidget(hintText: "Name..",
-                              //   prefixIcon: const Icon(Icons.person,color: Colors.black,),
-                              //   controller: name,
-                              //   suffixIconButton: null,
-                              //   ob: false,
-                              //   type: "name",
-                              //   inputType: TextInputType.name,
-                              // ),
-                              // const SizedBox(height: 10,),
-                              // TextFieldWidget(hintText: "Email..",
-                              //   prefixIcon: const Icon(Icons.email,color: Colors.black,),
-                              //   controller: email,
-                              //   suffixIconButton: null,
-                              //   ob: false,
-                              //   type: "email",
-                              //   inputType: TextInputType.emailAddress,
-                              // ),
-                              // const SizedBox(height: 10,),
-                              // TextFieldWidget(hintText: "Phone number..",
-                              //   prefixIcon: const Icon(Icons.phone_android,color: Colors.black,),
-                              //   controller: phone,
-                              //   suffixIconButton: null,
-                              //   ob: false,
-                              //   type: "phone",
-                              //   inputType: TextInputType.phone,
-                              // ),
-                              // const SizedBox(height: 10,),
-                              // TextFieldWidget(hintText: "Password..",
-                              //   prefixIcon: const Icon(Icons.lock,color: Colors.black,),
-                              //   controller: pass,
-                              //   suffixIconButton: IconButton(
-                              //     onPressed: () {
-                              //       setState(() {
-                              //         if (ob == true) {
-                              //           ob = false;
-                              //           iconpass = const Icon(Icons.visibility_off,color: Colors.black);
-                              //         } else {
-                              //           ob = true;
-                              //           iconpass = const Icon(Icons.visibility,color: Colors.black);
-                              //         }
-                              //       });
-                              //     },
-                              //     icon: iconpass,
-                              //   ),
-                              //   ob: ob, type: "pass",
-                              //   inputType: TextInputType.visiblePassword,
-                              // ),
-                              // const SizedBox(height: 10,),
-                              // TextFieldWidget(hintText: "Confirm Password..",
-                              //   prefixIcon: const Icon(Icons.lock,color: Colors.black,),
-                              //   controller: pass2,
-                              //   suffixIconButton: IconButton(
-                              //     onPressed: () {
-                              //       setState(() {
-                              //         if (ob2 == true) {
-                              //           ob2 = false;
-                              //           iconpass2 = const Icon(Icons.visibility_off,color: Colors.black);
-                              //         } else {
-                              //           ob2 = true;
-                              //           iconpass2 = const Icon(Icons.visibility,color: Colors.black);
-                              //         }
-                              //       });
-                              //     },
-                              //     icon: iconpass2,
-                              //   ),
-                              //   ob: ob2,
-                              //   type: "pass",
-                              //   inputType: TextInputType.visiblePassword,
-                              // ),
-                              const SizedBox(
-                                height: 40,
-                              ),
-                              InkWell(
-                                onTap: () {},
-                                child: PrimaryButton(
-                                  title: "SAVE",
-                                  width: width * 0.7,
-                                  backgroundcolor: AppColors.secondaryColor,
-                                  height: 40,
-                                ),
-                              ),
-                              const SizedBox(
-                                height: 20,
-                              ),
-                            ],
+                    Padding(
+                      padding: const EdgeInsets.all(15.0),
+                      child: Column(
+                        children: [
+                          TextFieldWidget(
+                            formKey: formName,
+                            controller: name,
+                            labelText: "Name",
+                            inputType: TextInputType.name,
+                            ob: false,
+                            prefixIcon: const Icon(
+                              Icons.person,
+                              color: Colors.white,
+                            ),
+                            suffixIconButton: null,
+                            type: "name",
                           ),
-                        ))
+                          const SizedBox(
+                            height: 10,
+                          ),
+                          TextFieldWidget(
+                            formKey: formEmail,
+                            controller: email,
+                            labelText: "Email",
+                            inputType: TextInputType.emailAddress,
+                            ob: false,
+                            prefixIcon: const Icon(
+                              Icons.email,
+                              color: Colors.white,
+                            ),
+                            suffixIconButton: null,
+                            type: "email",
+                          ),
+                          const SizedBox(
+                            height: 10,
+                          ),
+                          TextFieldWidget(
+                            formKey: formPhone,
+                            controller: phone,
+                            labelText: "Phone",
+                            inputType: TextInputType.phone,
+                            ob: false,
+                            prefixIcon: const Icon(
+                              Icons.phone_android,
+                              color: Colors.white,
+                            ),
+                            suffixIconButton: null,
+                            type: "phone",
+                          ),
+                          const SizedBox(
+                            height: 10,
+                          ),
+                          TextFieldWidget(
+                            formKey: formPass,
+                            controller: pass1,
+                            labelText: "Password",
+                            inputType: TextInputType.visiblePassword,
+                            ob: ob,
+                            prefixIcon: const Icon(
+                              Icons.lock,
+                              color: Colors.white,
+                            ),
+                            suffixIconButton: IconButton(
+                              onPressed: () {
+                                setState(() {
+                                  if (ob == true) {
+                                    ob = false;
+                                    iconpass = const Icon(Icons.visibility_off,
+                                        color: Colors.white);
+                                  } else {
+                                    ob = true;
+                                    iconpass = const Icon(Icons.visibility,
+                                        color: Colors.white);
+                                  }
+                                });
+                              },
+                              icon: iconpass,
+                            ),
+                            type: "pass",
+                          ),
+                          const SizedBox(
+                            height: 10,
+                          ),
+                          TextFieldWidget(
+                            formKey: formPass2,
+                            controller: pass2,
+                            labelText: "Confirem Password",
+                            inputType: TextInputType.visiblePassword,
+                            ob: ob2,
+                            prefixIcon: const Icon(
+                              Icons.lock,
+                              color: Colors.white,
+                            ),
+                            suffixIconButton: IconButton(
+                              onPressed: () {
+                                setState(() {
+                                  if (ob2 == true) {
+                                    ob2 = false;
+                                    iconpass2 = const Icon(Icons.visibility_off,
+                                        color: Colors.white);
+                                  } else {
+                                    ob2 = true;
+                                    iconpass2 = const Icon(Icons.visibility,
+                                        color: Colors.white);
+                                  }
+                                });
+                              },
+                              icon: iconpass2,
+                            ),
+                            type: "pass",
+                          ),
+                          const SizedBox(
+                            height: 40,
+                          ),
+                          InkWell(
+                            onTap: () {},
+                            child: PrimaryButton(
+                              title: "SAVE",
+                              width: width * 0.9,
+                              backgroundcolor: AppColors.secondaryColor,
+                              height: 50,
+                            ),
+                          ),
+                          const SizedBox(
+                            height: 20,
+                          ),
+                        ],
+                      ),
+                    ),
                   ],
                 ),
               ],

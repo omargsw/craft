@@ -1,4 +1,5 @@
 import 'package:craft/view/login_page.dart';
+import 'package:craft/view/splash_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -18,7 +19,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: const LoginPage(),
+      home: SplashScreen(),
     );
   }
 }

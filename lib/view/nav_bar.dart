@@ -1,7 +1,9 @@
 import 'package:craft/components/color.dart';
 import 'package:craft/components/font.dart';
+import 'package:craft/view/bills_page.dart';
 import 'package:craft/view/home_page.dart';
 import 'package:craft/view/profile_screen.dart';
+import 'package:craft/view/requests_page.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
@@ -26,8 +28,8 @@ class _NavBarState extends State<NavBar> {
   Widget build(BuildContext context) {
     final List<Widget> _pages = <Widget>[
       const HomePage(),
-      const HomePage(),
-      const HomePage(),
+      const RequestsPage(),
+      const BillsPage(),
       const ProfileScreen(),
     ];
     final colorScheme = Theme.of(context).colorScheme;
@@ -71,7 +73,7 @@ class _NavBarState extends State<NavBar> {
           type: BottomNavigationBarType.fixed,
           currentIndex: _currentIndex,
           backgroundColor: colorScheme.surface,
-          selectedItemColor: AppColors.secondaryColor,
+          selectedItemColor: AppColors.primaryColor,
           unselectedItemColor: colorScheme.onSurface.withOpacity(.30),
           selectedLabelStyle: textTheme.caption,
           unselectedLabelStyle: textTheme.caption,
@@ -82,12 +84,12 @@ class _NavBarState extends State<NavBar> {
               icon: Icon(Icons.home),
             ),
             BottomNavigationBarItem(
-              label: 'Centers',
-              icon: Icon(Icons.store),
+              label: 'Requests',
+              icon: Icon(Icons.list_alt),
             ),
             BottomNavigationBarItem(
-              label: 'Reservations',
-              icon: Icon(Icons.list_alt),
+              label: 'Bills',
+              icon: Icon(Icons.article_rounded),
             ),
             BottomNavigationBarItem(
               label: 'Profile',

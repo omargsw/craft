@@ -8,7 +8,8 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 class LoginPage extends StatefulWidget {
-  const LoginPage({Key? key}) : super(key: key);
+  final int typeId;
+  const LoginPage({Key? key, required this.typeId}) : super(key: key);
 
   @override
   State<LoginPage> createState() => _LoginPageState();
@@ -115,22 +116,25 @@ class _LoginPageState extends State<LoginPage> {
                       type: "pass",
                     ),
                     const Spacer(),
-                    InkWell(
-                      onTap: () => Get.to(const SignUpPage()),
-                      child: Center(
-                        child: RichText(
-                          text: TextSpan(
-                              text: "Don't have account?",
-                              style: AppFonts.tajawal16WhiteW600,
-                              children: [
-                                TextSpan(
-                                  text: " Sign up",
-                                  style: AppFonts.tajawal20BBlackW600Underline,
-                                )
-                              ]),
-                        ),
-                      ),
-                    ),
+                    (widget.typeId == 1)
+                        ? InkWell(
+                            onTap: () => Get.to(const SignUpPage()),
+                            child: Center(
+                              child: RichText(
+                                text: TextSpan(
+                                    text: "Don't have account?",
+                                    style: AppFonts.tajawal16WhiteW600,
+                                    children: [
+                                      TextSpan(
+                                        text: " Sign up",
+                                        style: AppFonts
+                                            .tajawal20BBlackW600Underline,
+                                      )
+                                    ]),
+                              ),
+                            ),
+                          )
+                        : Container(),
                     const SizedBox(
                       height: 10,
                     ),
