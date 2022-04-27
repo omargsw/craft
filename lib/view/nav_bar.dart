@@ -30,14 +30,14 @@ class _NavBarState extends State<NavBar> {
   Widget build(BuildContext context) {
     final List<Widget> _pages = <Widget>[
       const HomePage(),
-      const RequestsPage(),
+      //  const RequestsPage(),
       const BillsPage(),
       const ProfileScreen(),
     ];
     final List<Widget> _pagesAdmin = <Widget>[
       const HomePage(),
       const RequestsPage(),
-      const BillsPage(),
+      // const BillsPage(),
       const ProfileScreen(),
     ];
     final colorScheme = Theme.of(context).colorScheme;
@@ -100,10 +100,10 @@ class _NavBarState extends State<NavBar> {
                   label: 'Home',
                   icon: Icon(Icons.home),
                 ),
-                BottomNavigationBarItem(
-                  label: 'Requests',
-                  icon: Icon(Icons.list_alt),
-                ),
+                // BottomNavigationBarItem(
+                //   label: 'Requests',
+                //   icon: Icon(Icons.list_alt),
+                // ),
                 BottomNavigationBarItem(
                   label: 'Bills',
                   icon: Icon(Icons.article_rounded),
@@ -116,7 +116,7 @@ class _NavBarState extends State<NavBar> {
             )
           : BottomNavigationBar(
               type: BottomNavigationBarType.fixed,
-              currentIndex: _currentIndex,
+              currentIndex: _currentIndexAdmin,
               backgroundColor: colorScheme.surface,
               selectedItemColor: AppColors.primaryColor,
               unselectedItemColor: colorScheme.onSurface.withOpacity(.30),
@@ -132,10 +132,10 @@ class _NavBarState extends State<NavBar> {
                   label: 'Requests',
                   icon: Icon(Icons.list_alt),
                 ),
-                BottomNavigationBarItem(
-                  label: 'Bills',
-                  icon: Icon(Icons.article_rounded),
-                ),
+                // BottomNavigationBarItem(
+                //   label: 'Bills',
+                //   icon: Icon(Icons.article_rounded),
+                // ),
                 BottomNavigationBarItem(
                   label: 'Profile',
                   icon: Icon(Icons.person),
@@ -146,7 +146,7 @@ class _NavBarState extends State<NavBar> {
       body: Center(
         child: (widget.typeId == 1)
             ? _pages.elementAt(_currentIndex)
-            : _pages.elementAt(_currentIndexAdmin),
+            : _pagesAdmin.elementAt(_currentIndexAdmin),
       ),
     );
   }

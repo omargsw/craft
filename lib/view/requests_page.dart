@@ -2,6 +2,7 @@ import 'package:craft/components/color.dart';
 import 'package:craft/components/font.dart';
 import 'package:craft/components/main_app_bar.dart';
 import 'package:craft/main.dart';
+import 'package:craft/view/approve_requests_page.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
@@ -111,13 +112,21 @@ class _RequestsPageState extends State<RequestsPage> {
                                     "assets/images/nouserimage.jpg")),
                             trailing: TextButton(
                               onPressed: () {
-                                showModelSheetContactUs(
-                                  context,
-                                  'name',
-                                  '56654654',
-                                  'Greyhound divisively hello coldly wonderfully marginally far upon excluding.',
-                                  'assets/images/nouserimage.jpg',
-                                );
+                                Get.to(const ApproveRequestsPage(
+                                  name: "Omar",
+                                  profileImage: "assets/images/nouserimage.jpg",
+                                  phoneNumber: "0788888888",
+                                  desc:
+                                      'Greyhound divisively hello coldly wonderfully marginally far upon excluding.',
+                                  image: "assets/images/nouserimage.jpg",
+                                ));
+                                // showModelSheetContactUs(
+                                //   context,
+                                //   'name',
+                                //   '56654654',
+                                //   'Greyhound divisively hello coldly wonderfully marginally far upon excluding.',
+                                //   'assets/images/nouserimage.jpg',
+                                // );
                               },
                               child: Text(
                                 'View details',

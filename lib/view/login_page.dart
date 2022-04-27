@@ -150,7 +150,7 @@ class _LoginPageState extends State<LoginPage> {
                     await SharedPreferences.getInstance();
                 sharedPreferences.setInt('typeID', widget.typeId);
                 int? typeId = sharedPreferences.getInt('typeID');
-                Get.to(const NavBar(typeId: 1));
+                Get.to(NavBar(typeId: widget.typeId));
               },
               child: PrimaryButton(
                 title: "Login",

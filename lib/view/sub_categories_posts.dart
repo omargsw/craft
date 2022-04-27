@@ -100,7 +100,7 @@ class _PostsPageState extends State<PostsPage> {
                   children: [
                     TextButton.icon(
                       onPressed: () {
-                        showModelSheet(context);
+                        showModelSheetCooments(context);
                       },
                       label: Text(
                         'Comment',
@@ -138,7 +138,7 @@ class _PostsPageState extends State<PostsPage> {
     );
   }
 
-  void showModelSheet(BuildContext context) {
+  void showModelSheetCooments(BuildContext context) {
     showMaterialModalBottomSheet(
         context: context,
         builder: (builder) {
