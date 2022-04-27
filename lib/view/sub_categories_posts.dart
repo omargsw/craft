@@ -4,6 +4,7 @@ import 'package:craft/components/color.dart';
 import 'package:craft/components/font.dart';
 import 'package:craft/components/main_app_bar.dart';
 import 'package:craft/components/primary_button.dart';
+import 'package:craft/main.dart';
 import 'package:craft/view/add_post.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -19,6 +20,7 @@ class PostsPage extends StatefulWidget {
 }
 
 class _PostsPageState extends State<PostsPage> {
+  int? typeId = sharedPreferences!.getInt('typeID');
   GlobalKey<FormState> form = GlobalKey<FormState>();
   TextEditingController comment = TextEditingController();
   bool _load = false;
@@ -48,18 +50,20 @@ class _PostsPageState extends State<PostsPage> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: mainAppBar(title: widget.titlePage),
-      floatingActionButton: FloatingActionButton.extended(
-        backgroundColor: AppColors.primaryColor,
-        foregroundColor: Colors.black,
-        onPressed: () {
-          Get.to(const AddPost());
-        },
-        icon: const Icon(Icons.add),
-        label: Text(
-          'POST',
-          style: AppFonts.tajawal16BlackW600,
-        ),
-      ),
+      floatingActionButton: (typeId == 1)
+          ? FloatingActionButton.extended(
+              backgroundColor: AppColors.primaryColor,
+              foregroundColor: Colors.black,
+              onPressed: () {
+                Get.to(const AddPost());
+              },
+              icon: const Icon(Icons.add),
+              label: Text(
+                'POST',
+                style: AppFonts.tajawal16BlackW600,
+              ),
+            )
+          : Container(),
       body: ListView.builder(
         itemCount: 2,
         itemBuilder: (context, index) {
@@ -107,21 +111,23 @@ class _PostsPageState extends State<PostsPage> {
                         color: AppColors.primaryColor,
                       ),
                     ),
-                    TextButton(
-                      onPressed: () {
-                        showModelSheetContactUs(
-                          context,
-                          'name',
-                          '56654654',
-                          'Greyhound divisively hello coldly wonderfully marginally far upon excluding.',
-                          'assets/images/nouserimage.jpg',
-                        );
-                      },
-                      child: Text(
-                        'Connect with us',
-                        style: AppFonts.tajawal16PrimapryW600,
-                      ),
-                    ),
+                    (typeId == 1)
+                        ? TextButton(
+                            onPressed: () {
+                              showModelSheetContactUs(
+                                context,
+                                'name',
+                                '56654654',
+                                'Greyhound divisively hello coldly wonderfully marginally far upon excluding.',
+                                'assets/images/nouserimage.jpg',
+                              );
+                            },
+                            child: Text(
+                              'Connect with us',
+                              style: AppFonts.tajawal16PrimapryW600,
+                            ),
+                          )
+                        : Container(),
                   ],
                 ),
               ],

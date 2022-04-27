@@ -6,6 +6,7 @@ import 'package:craft/view/nav_bar.dart';
 import 'package:craft/view/signup_page.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginPage extends StatefulWidget {
   final int typeId;
@@ -144,7 +145,13 @@ class _LoginPageState extends State<LoginPage> {
               height: 30,
             ),
             InkWell(
-              onTap: (() => Get.to(const NavBar(typeId: 1))),
+              onTap: () async {
+                SharedPreferences sharedPreferences =
+                    await SharedPreferences.getInstance();
+                sharedPreferences.setInt('typeID', widget.typeId);
+                int? typeId = sharedPreferences.getInt('typeID');
+                Get.to(const NavBar(typeId: 1));
+              },
               child: PrimaryButton(
                 title: "Login",
                 width: width * 0.8,

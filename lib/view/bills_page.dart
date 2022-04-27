@@ -27,7 +27,7 @@ class _BillsPageState extends State<BillsPage> {
                   padding: const EdgeInsets.all(10),
                   decoration: BoxDecoration(
                     borderRadius: const BorderRadius.all(Radius.circular(16.0)),
-                    color: Colors.white,
+                    color: const Color.fromARGB(255, 82, 40, 40),
                     boxShadow: <BoxShadow>[
                       BoxShadow(
                         color: Colors.grey.withOpacity(0.8),
