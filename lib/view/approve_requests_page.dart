@@ -1,7 +1,13 @@
+import 'dart:convert';
+import 'dart:developer';
+
 import 'package:craft/components/font.dart';
 import 'package:craft/components/main_app_bar.dart';
 import 'package:craft/components/text_field_withColor.dart';
+import 'package:craft/components/web_config.dart';
+import 'package:craft/main.dart';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 
 class ApproveRequestsPage extends StatefulWidget {
   final String? name;
@@ -9,6 +15,9 @@ class ApproveRequestsPage extends StatefulWidget {
   final String? phoneNumber;
   final String? desc;
   final String? image;
+  final int? requestid;
+  final lat;
+  final long;
   const ApproveRequestsPage({
     Key? key,
     required this.name,
@@ -16,6 +25,9 @@ class ApproveRequestsPage extends StatefulWidget {
     required this.desc,
     required this.image,
     required this.phoneNumber,
+    this.lat,
+    this.long,
+    required this.requestid,
   }) : super(key: key);
 
   @override
@@ -23,11 +35,51 @@ class ApproveRequestsPage extends StatefulWidget {
 }
 
 class _ApproveRequestsPageState extends State<ApproveRequestsPage> {
-  GlobalKey<FormState> formDesc = GlobalKey<FormState>();
+  int? userId = sharedPreferences!.getInt('userID');
   GlobalKey<FormState> formPrice = GlobalKey<FormState>();
-  TextEditingController descController = TextEditingController();
   TextEditingController priceController = TextEditingController();
   bool isApprove = false;
+
+  Future updateupdateRequestForWho(
+      var requestid, var handyManid, var price) async {
+    try {
+      String url = WebConfig.baseUrl +
+          WebConfig.apisPath +
+          WebConfig.updateRequestForWho;
+      final response = await http.post(Uri.parse(url), body: {
+        "request_id": requestid,
+        "handy_man_id": handyManid,
+        "price": price,
+      });
+      var json = jsonDecode(response.body);
+      if (json['error']) {
+        return;
+      } else {
+        insertBill(requestid, price, "test", "test test test");
+      }
+      log(response.body);
+    } catch (e) {
+      log("[updateRequestForWho] $e");
+    }
+  }
+
+  Future insertBill(
+      var requestid, var totalprice, var title, var description) async {
+    try {
+      String url =
+          WebConfig.baseUrl + WebConfig.apisPath + WebConfig.insertBill;
+      final response = await http.post(Uri.parse(url), body: {
+        "request_id": requestid,
+        "total_price": totalprice,
+        "title": title,
+        "description": description,
+      });
+      log(response.body);
+    } catch (e) {
+      log("[insertBill] $e");
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -61,40 +113,23 @@ class _ApproveRequestsPageState extends State<ApproveRequestsPage> {
                 style: AppFonts.tajawal14BlackW600,
               ),
             ),
-            Container(
+            SizedBox(
+              width: MediaQuery.of(context).size.width * 0.9,
               height: MediaQuery.of(context).size.height * 0.4,
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: const BorderRadius.all(Radius.circular(100.0)),
-                boxShadow: <BoxShadow>[
-                  BoxShadow(
-                    color: Colors.grey.withOpacity(0.4),
-                    offset: const Offset(4, 4),
-                    blurRadius: 16,
-                  ),
-                ],
-              ),
-              child: Image.asset(widget.image!),
+              child: Image.network(WebConfig.baseUrl +
+                  WebConfig.apisPath +
+                  '/postImages/' +
+                  widget.image!),
             ),
             const SizedBox(
               height: 20,
-            ),
-            TextFieldWithColorWidget(
-              formKey: formDesc,
-              controller: descController,
-              labelText: "What do you need to fixed",
-              inputType: TextInputType.name,
-              ob: true,
-              prefixIcon: null,
-              suffixIconButton: null,
-              type: "name",
             ),
             TextFieldWithColorWidget(
               formKey: formPrice,
               controller: priceController,
               labelText: "Price",
               inputType: TextInputType.phone,
-              ob: true,
+              ob: false,
               prefixIcon: null,
               suffixIconButton: null,
               type: "name",
@@ -105,7 +140,13 @@ class _ApproveRequestsPageState extends State<ApproveRequestsPage> {
                 backgroundColor: Colors.green,
                 foregroundColor: Colors.black,
                 onPressed: () {
-                  // Get.to(const AddPost());
+                  print(widget.requestid.toString());
+                  print(userId.toString());
+                  print(priceController.text);
+                  if (formPrice.currentState!.validate()) {
+                    updateupdateRequestForWho(widget.requestid.toString(),
+                        userId.toString(), priceController.text);
+                  }
                 },
                 label: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 50),

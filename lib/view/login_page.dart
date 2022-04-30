@@ -1,12 +1,18 @@
+import 'dart:convert';
+import 'dart:developer';
+
 import 'package:craft/components/color.dart';
+import 'package:craft/components/context.dart';
 import 'package:craft/components/font.dart';
 import 'package:craft/components/primary_button.dart';
 import 'package:craft/components/text_field_widget.dart';
+import 'package:craft/components/web_config.dart';
 import 'package:craft/view/nav_bar.dart';
 import 'package:craft/view/signup_page.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:http/http.dart' as http;
 
 class LoginPage extends StatefulWidget {
   final int typeId;
@@ -17,20 +23,63 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
-  GlobalKey<FormState> formName = GlobalKey<FormState>();
   GlobalKey<FormState> formEmail = GlobalKey<FormState>();
-  GlobalKey<FormState> formPhone = GlobalKey<FormState>();
   GlobalKey<FormState> formPass = GlobalKey<FormState>();
   bool ob = true;
   Icon iconpass = const Icon(
     Icons.visibility,
     color: Colors.white,
   );
-  TextEditingController name = TextEditingController();
   TextEditingController email = TextEditingController();
-  TextEditingController phone = TextEditingController();
   TextEditingController pass1 = TextEditingController();
-  TextEditingController pass2 = TextEditingController();
+
+  Future<bool> userLoginIn(var email, var pass) async {
+    String url = WebConfig.baseUrl + WebConfig.apisPath + WebConfig.userLogin;
+    final response = await http.post(Uri.parse(url), body: {
+      "email": email.toString(),
+      "password": pass,
+    });
+    var json = jsonDecode(response.body);
+    if (json['error']) {
+      Contaxt().showErrorSnackBar(context, "Invalid user name or password");
+    } else {
+      SharedPreferences sharedPreferences =
+          await SharedPreferences.getInstance();
+      sharedPreferences.setInt('userID', json['user']['id']);
+      sharedPreferences.setString('name', json['user']['name']);
+      sharedPreferences.setString('email', json['user']['email']);
+      sharedPreferences.setString('phone', json['user']['phone']);
+      sharedPreferences.setString('image', json['user']['image']);
+      sharedPreferences.setString('password', json['user']['password']);
+      Get.to(NavBar(typeId: widget.typeId));
+    }
+    return true;
+  }
+
+  Future<bool> handlyManLoginIn(var email, var pass) async {
+    String url =
+        WebConfig.baseUrl + WebConfig.apisPath + WebConfig.handyManLogin;
+    final response = await http.post(Uri.parse(url), body: {
+      "email": email.toString(),
+      "password": pass,
+    });
+    var json = jsonDecode(response.body);
+    if (json['error']!) {
+      Contaxt().showErrorSnackBar(context, "Invalid user name or password");
+    } else {
+      SharedPreferences sharedPreferences =
+          await SharedPreferences.getInstance();
+      sharedPreferences.setInt('userID', json['user']['id']);
+      sharedPreferences.setString('name', json['user']['name']);
+      sharedPreferences.setString('email', json['user']['email']);
+      sharedPreferences.setString('phone', json['user']['phone']);
+      sharedPreferences.setString('image', json['user']['image']);
+      sharedPreferences.setString('password', json['user']['password']);
+      Get.to(NavBar(typeId: widget.typeId));
+    }
+    return true;
+  }
+
   @override
   Widget build(BuildContext context) {
     double width = MediaQuery.of(context).size.width;
@@ -150,7 +199,11 @@ class _LoginPageState extends State<LoginPage> {
                     await SharedPreferences.getInstance();
                 sharedPreferences.setInt('typeID', widget.typeId);
                 int? typeId = sharedPreferences.getInt('typeID');
-                Get.to(NavBar(typeId: widget.typeId));
+                if (widget.typeId == 1) {
+                  userLoginIn(email.text, pass1.text);
+                } else {
+                  handlyManLoginIn(email.text, pass1.text);
+                }
               },
               child: PrimaryButton(
                 title: "Login",

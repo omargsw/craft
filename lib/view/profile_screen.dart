@@ -1,7 +1,11 @@
+import 'dart:convert';
+import 'dart:developer';
 import 'dart:io';
 import 'package:craft/components/color.dart';
 import 'package:craft/components/primary_button.dart';
 import 'package:craft/components/text_field_widget.dart';
+import 'package:craft/components/web_config.dart';
+import 'package:craft/main.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
@@ -14,6 +18,12 @@ class ProfileScreen extends StatefulWidget {
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
+  int? userId = sharedPreferences!.getInt('userID');
+  String? accountname = sharedPreferences!.getString('name');
+  String? accountemail = sharedPreferences!.getString('email');
+  String? accountphone = sharedPreferences!.getString('phone');
+  String? accountpassword = sharedPreferences!.getString('password');
+  var accountImage = sharedPreferences!.getString('image');
   GlobalKey<FormState> formName = GlobalKey<FormState>();
   GlobalKey<FormState> formEmail = GlobalKey<FormState>();
   GlobalKey<FormState> formPhone = GlobalKey<FormState>();
@@ -26,10 +36,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
   TextEditingController pass2 = TextEditingController();
   bool ob = true, ob2 = true, ob3 = true;
   var confpass;
-  Icon iconpass = Icon(Icons.visibility, color: AppColors.primaryColor);
-  Icon iconpass2 = Icon(
+  Icon iconpass = const Icon(Icons.visibility, color: Colors.white);
+  Icon iconpass2 = const Icon(
     Icons.visibility,
-    color: AppColors.primaryColor,
+    color: Colors.white,
   );
   Icon iconpass3 = Icon(
     Icons.visibility,
@@ -83,78 +93,71 @@ class _ProfileScreenState extends State<ProfileScreen> {
     });
   }
 
-  // Widget bottomSheet() {
-  //   return Container(
-  //     height: 100.0,
-  //     width: MediaQuery.of(context).size.width,
-  //     margin: const EdgeInsets.symmetric(
-  //       horizontal: 20,
-  //       vertical: 20,
-  //     ),
-  //     child: Column(
-  //       children: <Widget>[
-  //         const Text(
-  //           "Choose profile image",
-  //           style: TextStyle(
-  //             fontSize: 20.0,
-  //           ),
-  //         ),
-  //         const SizedBox(
-  //           height: 3,
-  //         ),
-  //         Row(mainAxisAlignment: MainAxisAlignment.center, children: <Widget>[
-  //           FlatButton.icon(
-  //             icon: const Icon(Icons.image),
-  //             onPressed: () {
-  //               chooseImage(ImageSource.gallery);
-  //               Navigator.pop(context);
-  //             },
-  //             label: Text("gallery",style: TextStyle(),),
-  //
-  //           ),
-  //         ])
-  //       ],
-  //     ),
-  //   );
-  // }
+  Future updateAccount(
+      var customerid, var email, var name, var phone, var password) async {
+    try {
+      String url =
+          WebConfig.baseUrl + WebConfig.apisPath + WebConfig.updateAccount;
+      final response = await http.post(Uri.parse(url), body: {
+        "customer_id": customerid,
+        "email": email,
+        "name": name,
+        "phone": phone,
+        "password": password,
+      });
+      log(response.body);
+    } catch (e) {
+      log("[updateAccount] $e");
+    }
+  }
+
+  Widget bottomSheet() {
+    return Container(
+      height: 100.0,
+      width: MediaQuery.of(context).size.width,
+      margin: const EdgeInsets.symmetric(
+        horizontal: 20,
+        vertical: 20,
+      ),
+      child: Column(
+        children: <Widget>[
+          const Text(
+            "Choose profile image",
+            style: TextStyle(
+              fontSize: 20.0,
+            ),
+          ),
+          const SizedBox(
+            height: 3,
+          ),
+          Row(mainAxisAlignment: MainAxisAlignment.center, children: <Widget>[
+            FlatButton.icon(
+              icon: const Icon(Icons.image),
+              onPressed: () {
+                chooseImage(ImageSource.gallery);
+                Navigator.pop(context);
+              },
+              label: const Text(
+                "Gallery",
+                style: TextStyle(),
+              ),
+            ),
+          ])
+        ],
+      ),
+    );
+  }
 
   @override
   void initState() {
-    // typeId = sharedPreferences!.getInt('typeID');
-    // print(typeId);
     super.initState();
+    name.text = accountname.toString();
+    email.text = accountemail.toString();
+    phone.text = accountphone.toString();
+    name.text = accountname.toString();
+    pass1.text = accountpassword.toString();
+    pass2.text = accountpassword.toString();
   }
-
-  // Future updateName(int id, var name) async {
-  //   String url = 'https://abulsamrie11.000webhostapp.com/onTheGo/updatename.php';
-  //   final response = await http.post(Uri.parse(url),
-  //       body: {"id": id.toString(), "name": name});
-  //
-  //   print('UPDATE-NAME------>' + response.body);
-  // }
-
-  // Future updatePhone(int id, var phone) async {
-  //   String url = 'https://abulsamrie11.000webhostapp.com/onTheGo/updatephone.php';
-  //   final response = await http.post(Uri.parse(url),
-  //       body: {"id": id.toString(), "phone": phone});
-  //
-  //   print('UPDATE-PHONE------>' + response.body);
-  // }
-  //
-  // Future updatePassword(int id, var password) async {
-  //   String url = 'https://abulsamrie11.000webhostapp.com/onTheGo/updatepassword.php';
-  //   final response = await http.post(Uri.parse(url),
-  //       body: {"id": id.toString(), "password": password});
-  //
-  //   print('UPDATE-PASSWORD------>' + response.body);
-  // }
-  // Future updateImage(int id, var image,var profileDecoded) async {
-  //   String url = 'https://abulsamrie11.000webhostapp.com/onTheGo/updateimage.php';
-  //   final response = await http.post(Uri.parse(url),
-  //       body: {"id": id.toString(), "image": image,"profileDecoded": profileDecoded});
-  //
-  //   print('UPDATE-IMAGE------>' + response.body);
-  // }
 
   @override
   Widget build(BuildContext context) {
@@ -166,18 +169,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
         child: ListView.builder(
           itemCount: 1,
           itemBuilder: (context, index) {
-            //UserInfoApi userApi = widget.user![index];
-            // if(widget.user!.isEmpty || widget.user == null){
-            //   return Column(
-            //     mainAxisAlignment: MainAxisAlignment.center,
-            //     children: const [
-            //       CircularProgressIndicator(),
-            //     ],
-            //   );
-            // }else{
-            //   fname.text = userApi.name;
-            //   phnum.text = userApi.phone;
-            //   email.text = userApi.email;
             return Column(
               children: [
                 const SizedBox(
@@ -201,8 +192,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 ],
                               ),
                               child: ClipOval(
-                                child: Image.asset(
-                                  'assets/images/logo.jpeg',
+                                child: Image.network(
+                                  'https://ogsw.000webhostapp.com/Sanay3i/customerImages/' +
+                                      accountImage.toString(),
                                   width: 200,
                                   height: 200,
                                   fit: BoxFit.cover,
@@ -236,10 +228,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             imageFile == null
                                 ? InkWell(
                                     onTap: () async {
-                                      // showModalBottomSheet(
-                                      //   context: context,
-                                      //   builder: ((builder) => bottomSheet()),
-                                      // );
+                                      showModalBottomSheet(
+                                        context: context,
+                                        builder: ((builder) => bottomSheet()),
+                                      );
                                     },
                                     child: const Icon(
                                       Icons.camera_alt,
@@ -251,11 +243,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                     children: [
                                       InkWell(
                                         onTap: () async {
-                                          // showModalBottomSheet(
-                                          //   context: context,
-                                          //   builder: ((builder) => bottomSheet()),
-                                          //
-                                          // );
+                                          showModalBottomSheet(
+                                            context: context,
+                                            builder: ((builder) =>
+                                                bottomSheet()),
+                                          );
                                         },
                                         child: const Icon(
                                           Icons.camera_alt,
@@ -268,11 +260,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                             const EdgeInsets.only(left: 10),
                                         child: InkWell(
                                           onTap: () async {
-                                            // if (imageFile == null ) return ;
-                                            // photo = base64Encode(imageFile!.readAsBytesSync());
-                                            // imagepath = imageFile!.path.split("/").last;
+                                            if (imageFile == null) return;
+                                            photo = base64Encode(
+                                                imageFile!.readAsBytesSync());
+                                            imagepath =
+                                                imageFile!.path.split("/").last;
                                             // updateImage(id!, imagepath, photo);
-                                            // imageCache!.clear();
+                                            imageCache!.clear();
                                           },
                                           child: const Icon(
                                             Icons.done,

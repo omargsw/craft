@@ -1,5 +1,6 @@
 import 'package:craft/components/color.dart';
 import 'package:craft/components/font.dart';
+import 'package:craft/main.dart';
 import 'package:craft/view/bills_page.dart';
 import 'package:craft/view/home_page.dart';
 import 'package:craft/view/profile_screen.dart';
@@ -8,6 +9,7 @@ import 'package:craft/view/splash_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 
 class NavBar extends StatefulWidget {
   final int? typeId;
@@ -18,12 +20,15 @@ class NavBar extends StatefulWidget {
 }
 
 class _NavBarState extends State<NavBar> {
+  int? userId = sharedPreferences!.getInt('userID');
+  var accountImage = sharedPreferences!.getString('image');
   int _currentIndex = 0;
   int _currentIndexAdmin = 0;
 
   @override
   void initState() {
     super.initState();
+    print("asdasd" + accountImage.toString());
   }
 
   @override
@@ -61,8 +66,9 @@ class _NavBarState extends State<NavBar> {
         leading: Padding(
           padding: const EdgeInsets.all(5.0),
           child: ClipOval(
-            child: Image.asset(
-              'assets/images/nouserimage.jpg',
+            child: Image.network(
+              'https://ogsw.000webhostapp.com/Sanay3i/customerImages/' +
+                  accountImage.toString(),
               width: 75,
               height: 75,
               fit: BoxFit.cover,
@@ -75,8 +81,11 @@ class _NavBarState extends State<NavBar> {
         ),
         actions: [
           IconButton(
-              onPressed: () {
-                Get.to(SplashScreen());
+              onPressed: () async {
+                Get.offAll(() => SplashScreen());
+                SharedPreferences sharedPreferences =
+                    await SharedPreferences.getInstance();
+                sharedPreferences.clear();
               },
               icon: const Icon(
                 Icons.logout,

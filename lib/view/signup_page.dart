@@ -1,8 +1,14 @@
+import 'dart:convert';
 import 'package:craft/components/color.dart';
+import 'package:craft/components/context.dart';
 import 'package:craft/components/font.dart';
 import 'package:craft/components/primary_button.dart';
 import 'package:craft/components/text_field_widget.dart';
+import 'package:craft/components/web_config.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:http/http.dart' as http;
+import 'nav_bar.dart';
 
 class SignUpPage extends StatefulWidget {
   const SignUpPage({Key? key}) : super(key: key);
@@ -32,6 +38,24 @@ class _SignUpPageState extends State<SignUpPage> {
   TextEditingController phone = TextEditingController();
   TextEditingController pass1 = TextEditingController();
   TextEditingController pass2 = TextEditingController();
+
+  Future<bool> userSignUp(var email, var pass, var phone, var name) async {
+    String url = WebConfig.baseUrl + WebConfig.apisPath + WebConfig.userSignUp;
+    final response = await http.post(Uri.parse(url), body: {
+      "name": name,
+      "email": email.toString(),
+      "phone": phone,
+      "password": pass,
+    });
+    var json = jsonDecode(response.body);
+    if (json['error']) {
+      Contaxt().showErrorSnackBar(context, "User already registered");
+    } else {
+      Get.to(const NavBar(typeId: 1));
+    }
+    return true;
+  }
+
   @override
   Widget build(BuildContext context) {
     double width = MediaQuery.of(context).size.width;
@@ -174,11 +198,26 @@ class _SignUpPageState extends State<SignUpPage> {
             const SizedBox(
               height: 30,
             ),
-            PrimaryButton(
-              title: "SignUp",
-              width: width * 0.8,
-              backgroundcolor: AppColors.secondaryColor,
-              height: 50,
+            InkWell(
+              onTap: () {
+                if (formName.currentState!.validate() &&
+                    formEmail.currentState!.validate() &&
+                    formPhone.currentState!.validate() &&
+                    formPass2.currentState!.validate()) {
+                  if (pass1.text == pass2.text) {
+                    userSignUp(email.text, pass2.text, phone.text, name.text);
+                  } else {
+                    Contaxt()
+                        .showErrorSnackBar(context, "Password doesn't match");
+                  }
+                }
+              },
+              child: PrimaryButton(
+                title: "SignUp",
+                width: width * 0.8,
+                backgroundcolor: AppColors.secondaryColor,
+                height: 50,
+              ),
             ),
           ],
         ),

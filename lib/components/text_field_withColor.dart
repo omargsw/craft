@@ -30,7 +30,7 @@ class TextFieldWithColorWidget extends StatelessWidget {
       child: Form(
         key: formKey,
         child: TextFormField(
-          style: const TextStyle(color: Colors.white),
+          style: TextStyle(color: AppColors.primaryColor),
           cursorColor: Colors.white,
           keyboardType: inputType,
           decoration: InputDecoration(
@@ -70,23 +70,6 @@ class TextFieldWithColorWidget extends StatelessWidget {
           validator: (value) {
             if (value!.isEmpty) {
               return "required";
-            } else if (type == "name") {
-              if (value.length < 5) {
-                return "The name must be greater or equal to 5";
-              }
-            } else if (type == "email") {
-              if (!RegExp("^[a-zA-Z0-9+_.-]+@[a-zA-Z0-9.-]+.[a-z]")
-                  .hasMatch(value)) {
-                return "enter the currected email";
-              }
-            } else if (type == "phone") {
-              if (value.length != 10) {
-                return "Phone number must be 10 numbers";
-              }
-            } else if (type == "pass") {
-              if (value.length <= 6) {
-                return "Password must be greater than 6 characters";
-              }
             }
             return null;
           },

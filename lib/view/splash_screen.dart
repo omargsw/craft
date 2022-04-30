@@ -1,10 +1,10 @@
 import 'dart:async';
-
 import 'package:craft/components/color.dart';
 import 'package:craft/components/primary_button.dart';
 import 'package:craft/view/login_page.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:geolocator/geolocator.dart';
 
 class SplashScreen extends StatefulWidget {
   @override
@@ -13,6 +13,50 @@ class SplashScreen extends StatefulWidget {
 
 class _SplashScreenState extends State<SplashScreen> {
   bool time = false;
+var lat, long;
+  late Position cl;
+
+    Future getPer() async {
+    bool services;
+    LocationPermission per;
+    services = await Geolocator.isLocationServiceEnabled();
+    if (services == false) {
+      showDialog(
+          context: context,
+          builder: (ctx) => AlertDialog(
+                title: const Text(
+                  "Services Not Enabled",
+                  style: TextStyle(fontSize: 15, color: Colors.black),
+                ),
+                content: const Text(
+                  'Open Your Location',
+                  style: TextStyle(fontSize: 12, color: Colors.black45),
+                ),
+                actions: <Widget>[
+                  FlatButton(
+                    child: Text('Okay'),
+                    onPressed: () {
+                      Navigator.of(ctx).pop();
+                    },
+                  )
+                ],
+              ));
+    }
+    per = await Geolocator.checkPermission();
+    if (per == LocationPermission.denied) {
+      per == await Geolocator.requestPermission();
+    } else {
+      getLateAndLang();
+    }
+    return per;
+  }
+
+  Future<void> getLateAndLang() async {
+    cl = await Geolocator.getCurrentPosition().then((value) => value);
+    lat = cl.latitude;
+    long = cl.longitude;
+    setState(() {});
+  }
   @override
   void initState() {
     super.initState();
@@ -69,7 +113,7 @@ class _SplashScreenState extends State<SplashScreen> {
                 typeId: 2,
               )),
               child: PrimaryButton(
-                  title: "Login as admin",
+                  title: "Login as Handy man",
                   width: width * 0.8,
                   backgroundcolor: AppColors.secondaryColor,
                   height: 50),

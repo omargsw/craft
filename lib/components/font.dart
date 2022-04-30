@@ -69,6 +69,12 @@ class AppFonts {
     fontWeight: FontWeight.w600,
   );
 
+  static TextStyle tajawal14PrimapryW400 = GoogleFonts.tajawal(
+    fontSize: 14,
+    color: AppColors.primaryColor,
+    fontWeight: FontWeight.w400,
+  );
+
   static TextStyle tajawal14PrimapryW600 = GoogleFonts.tajawal(
     fontSize: 14,
     color: AppColors.primaryColor,

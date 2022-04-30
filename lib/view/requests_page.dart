@@ -1,11 +1,15 @@
+import 'dart:developer';
+
 import 'package:craft/components/color.dart';
 import 'package:craft/components/font.dart';
-import 'package:craft/components/main_app_bar.dart';
+import 'package:craft/components/web_config.dart';
 import 'package:craft/main.dart';
+import 'package:craft/model/fetch_request.dart';
 import 'package:craft/view/approve_requests_page.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
+import 'package:http/http.dart' as http;
 
 class RequestsPage extends StatefulWidget {
   const RequestsPage({Key? key}) : super(key: key);
@@ -16,6 +20,37 @@ class RequestsPage extends StatefulWidget {
 
 class _RequestsPageState extends State<RequestsPage> {
   int? typeId = sharedPreferences!.getInt('typeID');
+  bool isLoading = false;
+
+  List<FetchRequests> requests = [];
+  Future fetchRequest() async {
+    isLoading = true;
+    try {
+      String url =
+          WebConfig.baseUrl + WebConfig.apisPath + WebConfig.getRequests;
+      final response = await http.get(Uri.parse(url));
+      if (response.statusCode == 200) {
+        final List<FetchRequests> requestlist =
+            fetchRequestsFromJson(response.body);
+        return requestlist;
+      }
+    } catch (e) {
+      log("[fetchRequest] $e");
+    } finally {
+      isLoading = false;
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    fetchRequest().then((requestlist) {
+      setState(() {
+        requests = requestlist;
+      });
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     double width = MediaQuery.of(context).size.width;
@@ -78,85 +113,91 @@ class _RequestsPageState extends State<RequestsPage> {
                   );
                 },
               )
-            : ListView.builder(
-                itemCount: 5,
-                itemBuilder: (context, index) {
-                  return Column(
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 5),
-                        child: Container(
-                          height: 100,
-                          width: width * 0.9,
-                          padding: const EdgeInsets.all(10),
-                          decoration: BoxDecoration(
-                            borderRadius:
-                                const BorderRadius.all(Radius.circular(16.0)),
-                            color: Colors.white,
-                            boxShadow: <BoxShadow>[
-                              BoxShadow(
-                                color: Colors.grey.withOpacity(0.8),
-                                offset: const Offset(4, 4),
-                                blurRadius: 5,
+            : (requests.isEmpty || requests == null)
+                ? Center(
+                    child: CircularProgressIndicator(
+                      color: AppColors.primaryColor,
+                    ),
+                  )
+                : ListView.builder(
+                    itemCount: requests.length,
+                    itemBuilder: (context, index) {
+                      FetchRequests requestApi = requests[index];
+                      return Column(
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 5),
+                            child: Container(
+                              height: 115,
+                              width: width * 0.9,
+                              padding: const EdgeInsets.all(10),
+                              decoration: BoxDecoration(
+                                borderRadius: const BorderRadius.all(
+                                    Radius.circular(16.0)),
+                                color: Colors.white,
+                                boxShadow: <BoxShadow>[
+                                  BoxShadow(
+                                    color: Colors.grey.withOpacity(0.8),
+                                    offset: const Offset(4, 4),
+                                    blurRadius: 5,
+                                  ),
+                                ],
                               ),
-                            ],
-                          ),
-                          child: ListTile(
-                            contentPadding: const EdgeInsets.symmetric(
-                              horizontal: 5,
-                              vertical: 5,
-                            ),
-                            leading: const CircleAvatar(
-                                radius: 25,
-                                backgroundImage: AssetImage(
-                                    "assets/images/nouserimage.jpg")),
-                            trailing: TextButton(
-                              onPressed: () {
-                                Get.to(const ApproveRequestsPage(
-                                  name: "Omar",
-                                  profileImage: "assets/images/nouserimage.jpg",
-                                  phoneNumber: "0788888888",
-                                  desc:
-                                      'Greyhound divisively hello coldly wonderfully marginally far upon excluding.',
-                                  image: "assets/images/nouserimage.jpg",
-                                ));
-                                // showModelSheetContactUs(
-                                //   context,
-                                //   'name',
-                                //   '56654654',
-                                //   'Greyhound divisively hello coldly wonderfully marginally far upon excluding.',
-                                //   'assets/images/nouserimage.jpg',
-                                // );
-                              },
-                              child: Text(
-                                'View details',
-                                style: AppFonts.tajawal16PrimapryW600,
-                              ),
-                            ),
-                            title: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                SizedBox(
-                                  width: width * 0.5,
-                                  child: Wrap(
-                                    children: [
-                                      Text("Omar wathaifi",
-                                          style: AppFonts.tajawal16BlackW600),
-                                    ],
+                              child: ListTile(
+                                contentPadding: const EdgeInsets.symmetric(
+                                  horizontal: 5,
+                                  vertical: 5,
+                                ),
+                                leading: const CircleAvatar(
+                                    radius: 25,
+                                    backgroundImage: AssetImage(
+                                        "assets/images/nouserimage.jpg")),
+                                trailing: TextButton(
+                                  onPressed: () {
+                                    Get.to(ApproveRequestsPage(
+                                      name: requestApi.name,
+                                      profileImage:
+                                          "assets/images/nouserimage.jpg",
+                                      phoneNumber: requestApi.phone,
+                                      desc: requestApi.descrption,
+                                      image: requestApi.image,
+                                      lat: requestApi.latitude,
+                                      long: requestApi.longitude,
+                                      requestid: requestApi.id,
+                                    ));
+                                  },
+                                  child: Text(
+                                    'View details',
+                                    style: AppFonts.tajawal16PrimapryW600,
                                   ),
                                 ),
-                                const SizedBox(height: 4),
-                                Text("0784523698",
-                                    style: AppFonts.tajawal16BlackW600),
-                              ],
+                                title: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    SizedBox(
+                                      width: width * 0.5,
+                                      child: Wrap(
+                                        children: [
+                                          Text(requestApi.name,
+                                              style:
+                                                  AppFonts.tajawal16BlackW600),
+                                        ],
+                                      ),
+                                    ),
+                                    const SizedBox(height: 4),
+                                    Text(requestApi.phone,
+                                        style: AppFonts.tajawal16BlackW600),
+                                    Text(requestApi.status,
+                                        style: AppFonts.tajawal14PrimapryW400),
+                                  ],
+                                ),
+                              ),
                             ),
                           ),
-                        ),
-                      ),
-                    ],
-                  );
-                },
-              ));
+                        ],
+                      );
+                    },
+                  ));
   }
 
   void showModelSheetContactUs(BuildContext context, String name, String phone,
