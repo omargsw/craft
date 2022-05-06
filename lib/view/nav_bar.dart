@@ -28,15 +28,14 @@ class _NavBarState extends State<NavBar> {
   @override
   void initState() {
     super.initState();
-    print("asdasd" + accountImage.toString());
   }
 
   @override
   Widget build(BuildContext context) {
     final List<Widget> _pages = <Widget>[
       const HomePage(),
-      //  const RequestsPage(),
-      const BillsPage(),
+      const RequestsPage(),
+      // const BillsPage(),
       const ProfileScreen(),
     ];
     final List<Widget> _pagesAdmin = <Widget>[
@@ -109,14 +108,14 @@ class _NavBarState extends State<NavBar> {
                   label: 'Home',
                   icon: Icon(Icons.home),
                 ),
-                // BottomNavigationBarItem(
-                //   label: 'Requests',
-                //   icon: Icon(Icons.list_alt),
-                // ),
                 BottomNavigationBarItem(
-                  label: 'Bills',
-                  icon: Icon(Icons.article_rounded),
+                  label: 'Requests',
+                  icon: Icon(Icons.list_alt),
                 ),
+                // BottomNavigationBarItem(
+                //   label: 'Bills',
+                //   icon: Icon(Icons.article_rounded),
+                // ),
                 BottomNavigationBarItem(
                   label: 'Profile',
                   icon: Icon(Icons.person),

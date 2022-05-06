@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:developer';
 import 'dart:io';
 import 'package:craft/components/color.dart';
+import 'package:craft/components/context.dart';
 import 'package:craft/components/primary_button.dart';
 import 'package:craft/components/text_field_widget.dart';
 import 'package:craft/components/web_config.dart';
@@ -18,6 +19,7 @@ class ProfileScreen extends StatefulWidget {
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
+  int? typeId = sharedPreferences!.getInt('typeID');
   int? userId = sharedPreferences!.getInt('userID');
   String? accountname = sharedPreferences!.getString('name');
   String? accountemail = sharedPreferences!.getString('email');
@@ -53,32 +55,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
   String photo = '';
   String imagepath = '';
 
-  void _showDoneSnackBar(BuildContext context, String text) {
-    final snackBar = SnackBar(
-      content: Row(
-        mainAxisAlignment: MainAxisAlignment.start,
-        children: [
-          const Icon(
-            Icons.done_outline,
-            size: 20,
-            color: Colors.green,
-          ),
-          const SizedBox(width: 16),
-          Expanded(
-            child: Text(
-              text,
-              style: const TextStyle(fontSize: 15, color: Colors.green),
-            ),
-          ),
-        ],
-      ),
-      backgroundColor: Colors.black45,
-      duration: const Duration(seconds: 3),
-      behavior: SnackBarBehavior.floating,
-    );
-    ScaffoldMessenger.of(context).showSnackBar(snackBar);
-  }
-
   Future chooseImage(ImageSource source) async {
     final pickedFile = await imagePicker.pickImage(source: source);
     setState(() {
@@ -108,6 +84,40 @@ class _ProfileScreenState extends State<ProfileScreen> {
       log(response.body);
     } catch (e) {
       log("[updateAccount] $e");
+    }
+  }
+
+  Future updateUserImage(var customerid, var image, var profileDecoded) async {
+    try {
+      String url =
+          WebConfig.baseUrl + WebConfig.apisPath + WebConfig.updateUserImage;
+      final response = await http.post(Uri.parse(url), body: {
+        "customer_id": customerid,
+        "email": image,
+        "profileDecoded": profileDecoded
+      });
+      log(response.body);
+    } catch (e) {
+      log("[updateUserImage] $e");
+    }
+  }
+
+  Future updateAccountHandyMan(
+      var customerid, var email, var name, var phone, var password) async {
+    try {
+      String url = WebConfig.baseUrl +
+          WebConfig.apisPath +
+          WebConfig.updateAccountHandyMan;
+      final response = await http.post(Uri.parse(url), body: {
+        "customer_id": customerid,
+        "email": email,
+        "name": name,
+        "phone": phone,
+        "password": password,
+      });
+      log(response.body);
+    } catch (e) {
+      log("[updateAccountHandyMan] $e");
     }
   }
 
@@ -405,7 +415,39 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             height: 40,
                           ),
                           InkWell(
-                            onTap: () {},
+                            onTap: () {
+                              if (typeId == 1) {
+                                if (formName.currentState!.validate() &&
+                                    formEmail.currentState!.validate() &&
+                                    formPhone.currentState!.validate() &&
+                                    formPass2.currentState!.validate()) {
+                                  if (pass1.text == pass2.text) {
+                                    updateAccount(userId.toString(), email.text,
+                                        name.text, phone.text, pass2.text);
+                                  } else {
+                                    Contaxt().showErrorSnackBar(
+                                        context, "Password doesn't match");
+                                  }
+                                }
+                              } else {
+                                if (formName.currentState!.validate() &&
+                                    formEmail.currentState!.validate() &&
+                                    formPhone.currentState!.validate() &&
+                                    formPass2.currentState!.validate()) {
+                                  if (pass1.text == pass2.text) {
+                                    updateAccountHandyMan(
+                                        userId.toString(),
+                                        email.text,
+                                        name.text,
+                                        phone.text,
+                                        pass2.text);
+                                  } else {
+                                    Contaxt().showErrorSnackBar(
+                                        context, "Password doesn't match");
+                                  }
+                                }
+                              }
+                            },
                             child: PrimaryButton(
                               title: "SAVE",
                               width: width * 0.9,

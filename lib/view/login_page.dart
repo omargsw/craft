@@ -25,6 +25,7 @@ class LoginPage extends StatefulWidget {
 class _LoginPageState extends State<LoginPage> {
   GlobalKey<FormState> formEmail = GlobalKey<FormState>();
   GlobalKey<FormState> formPass = GlobalKey<FormState>();
+  bool isLoading = false;
   bool ob = true;
   Icon iconpass = const Icon(
     Icons.visibility,
@@ -33,51 +34,75 @@ class _LoginPageState extends State<LoginPage> {
   TextEditingController email = TextEditingController();
   TextEditingController pass1 = TextEditingController();
 
-  Future<bool> userLoginIn(var email, var pass) async {
-    String url = WebConfig.baseUrl + WebConfig.apisPath + WebConfig.userLogin;
-    final response = await http.post(Uri.parse(url), body: {
-      "email": email.toString(),
-      "password": pass,
+  Future userLoginIn(var email, var pass) async {
+    setState(() {
+      isLoading = true;
     });
-    var json = jsonDecode(response.body);
-    if (json['error']) {
-      Contaxt().showErrorSnackBar(context, "Invalid user name or password");
-    } else {
-      SharedPreferences sharedPreferences =
-          await SharedPreferences.getInstance();
-      sharedPreferences.setInt('userID', json['user']['id']);
-      sharedPreferences.setString('name', json['user']['name']);
-      sharedPreferences.setString('email', json['user']['email']);
-      sharedPreferences.setString('phone', json['user']['phone']);
-      sharedPreferences.setString('image', json['user']['image']);
-      sharedPreferences.setString('password', json['user']['password']);
-      Get.to(NavBar(typeId: widget.typeId));
+    try {
+      String url = WebConfig.baseUrl + WebConfig.apisPath + WebConfig.userLogin;
+      final response = await http.post(Uri.parse(url), body: {
+        "email": email.toString(),
+        "password": pass,
+      });
+      var json = jsonDecode(response.body);
+      if (json['error']) {
+        Contaxt().showErrorSnackBar(context, "Invalid user name or password");
+        setState(() {
+          isLoading = false;
+        });
+      } else {
+        SharedPreferences sharedPreferences =
+            await SharedPreferences.getInstance();
+        sharedPreferences.setInt('userID', json['user']['id']);
+        sharedPreferences.setString('name', json['user']['name']);
+        sharedPreferences.setString('email', json['user']['email']);
+        sharedPreferences.setString('phone', json['user']['phone']);
+        sharedPreferences.setString('image', json['user']['image']);
+        sharedPreferences.setString('password', json['user']['password']);
+        Get.to(NavBar(typeId: widget.typeId));
+      }
+      return true;
+    } catch (e) {
+      log("[userLoginIn] : $e");
+    } finally {
+      isLoading = false;
     }
-    return true;
   }
 
-  Future<bool> handlyManLoginIn(var email, var pass) async {
-    String url =
-        WebConfig.baseUrl + WebConfig.apisPath + WebConfig.handyManLogin;
-    final response = await http.post(Uri.parse(url), body: {
-      "email": email.toString(),
-      "password": pass,
+  Future handlyManLoginIn(var email, var pass) async {
+    setState(() {
+      isLoading = true;
     });
-    var json = jsonDecode(response.body);
-    if (json['error']!) {
-      Contaxt().showErrorSnackBar(context, "Invalid user name or password");
-    } else {
-      SharedPreferences sharedPreferences =
-          await SharedPreferences.getInstance();
-      sharedPreferences.setInt('userID', json['user']['id']);
-      sharedPreferences.setString('name', json['user']['name']);
-      sharedPreferences.setString('email', json['user']['email']);
-      sharedPreferences.setString('phone', json['user']['phone']);
-      sharedPreferences.setString('image', json['user']['image']);
-      sharedPreferences.setString('password', json['user']['password']);
-      Get.to(NavBar(typeId: widget.typeId));
+    try {
+      String url =
+          WebConfig.baseUrl + WebConfig.apisPath + WebConfig.handyManLogin;
+      final response = await http.post(Uri.parse(url), body: {
+        "email": email.toString(),
+        "password": pass,
+      });
+      var json = jsonDecode(response.body);
+      if (json['error']!) {
+        Contaxt().showErrorSnackBar(context, "Invalid user name or password");
+        setState(() {
+          isLoading = false;
+        });
+      } else {
+        SharedPreferences sharedPreferences =
+            await SharedPreferences.getInstance();
+        sharedPreferences.setInt('userID', json['user']['id']);
+        sharedPreferences.setString('name', json['user']['name']);
+        sharedPreferences.setString('email', json['user']['email']);
+        sharedPreferences.setString('phone', json['user']['phone']);
+        sharedPreferences.setString('image', json['user']['image']);
+        sharedPreferences.setString('password', json['user']['password']);
+        Get.to(NavBar(typeId: widget.typeId));
+      }
+      return true;
+    } catch (e) {
+      log("[handlyManLoginIn] : $e");
+    } finally {
+      isLoading = false;
     }
-    return true;
   }
 
   @override
@@ -165,6 +190,16 @@ class _LoginPageState extends State<LoginPage> {
                       ),
                       type: "pass",
                     ),
+                    const SizedBox(
+                      height: 30,
+                    ),
+                    isLoading
+                        ? const CircularProgressIndicator(
+                            color: Colors.white,
+                          )
+                        : const SizedBox(
+                            height: 0,
+                          ),
                     const Spacer(),
                     (widget.typeId == 1)
                         ? InkWell(

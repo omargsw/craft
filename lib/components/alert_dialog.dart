@@ -31,14 +31,14 @@ class _AlertDialogWidgetState extends State<AlertDialogWidget> {
           },
           child: Text('NO',
               style: TextStyle(
-                color: AppColors.secondaryColor,
+                color: AppColors.primaryColor,
               )),
         ),
         TextButton(
           onPressed: widget.onTapYes,
           child: Text('YES',
               style: TextStyle(
-                color: AppColors.secondaryColor,
+                color: AppColors.primaryColor,
               )),
         ),
       ],

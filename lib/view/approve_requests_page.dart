@@ -6,7 +6,9 @@ import 'package:craft/components/main_app_bar.dart';
 import 'package:craft/components/text_field_withColor.dart';
 import 'package:craft/components/web_config.dart';
 import 'package:craft/main.dart';
+import 'package:craft/view/location_and_bill_page.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 
 class ApproveRequestsPage extends StatefulWidget {
@@ -55,28 +57,11 @@ class _ApproveRequestsPageState extends State<ApproveRequestsPage> {
       if (json['error']) {
         return;
       } else {
-        insertBill(requestid, price, "test", "test test test");
+        //insertBill(requestid, price, "test", "test test test");
       }
       log(response.body);
     } catch (e) {
       log("[updateRequestForWho] $e");
-    }
-  }
-
-  Future insertBill(
-      var requestid, var totalprice, var title, var description) async {
-    try {
-      String url =
-          WebConfig.baseUrl + WebConfig.apisPath + WebConfig.insertBill;
-      final response = await http.post(Uri.parse(url), body: {
-        "request_id": requestid,
-        "total_price": totalprice,
-        "title": title,
-        "description": description,
-      });
-      log(response.body);
-    } catch (e) {
-      log("[insertBill] $e");
     }
   }
 
@@ -140,12 +125,15 @@ class _ApproveRequestsPageState extends State<ApproveRequestsPage> {
                 backgroundColor: Colors.green,
                 foregroundColor: Colors.black,
                 onPressed: () {
-                  print(widget.requestid.toString());
-                  print(userId.toString());
-                  print(priceController.text);
                   if (formPrice.currentState!.validate()) {
                     updateupdateRequestForWho(widget.requestid.toString(),
                         userId.toString(), priceController.text);
+                    Get.to(LocationAndBillPage(
+                      lat: widget.lat,
+                      long: widget.long,
+                      requestId: widget.requestid!,
+                      price: priceController.text,
+                    ));
                   }
                 },
                 label: Padding(

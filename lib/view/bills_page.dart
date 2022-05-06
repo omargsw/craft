@@ -43,7 +43,7 @@ class _BillsPageState extends State<BillsPage> {
                     children: [
                       Center(
                         child: Text(
-                          "Carft details",
+                          "Handy man details",
                           style: AppFonts.tajawal20PrimaryW600,
                         ),
                       ),

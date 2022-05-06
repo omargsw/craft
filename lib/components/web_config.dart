@@ -16,7 +16,11 @@ class WebConfig {
   static String deletePost = '/deletePost.php';
   static String updateAccount = '/updateAccount.php';
   static String updateUserImage = '/updateUserImage.php';
+  static String updateAccountHandyMan = '/updateAccountHandyMan.php';
   static String getRequests = '/getRequests.php';
   static String updateRequestForWho = '/updateRequestForWho.php';
   static String insertBill = '/insertBill.php';
+  static String getRequestsCustomer = '/getRequestsCustomer.php';
+  static String getBills = '/getBills.php';
+  static String cancelRequest = '/cancelRequest.php';
 }
