@@ -93,8 +93,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           WebConfig.baseUrl + WebConfig.apisPath + WebConfig.updateUserImage;
       final response = await http.post(Uri.parse(url), body: {
         "customer_id": customerid,
-        "email": image,
-        "profileDecoded": profileDecoded
+        "image": image,
       });
       log(response.body);
     } catch (e) {
@@ -103,13 +102,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   Future updateAccountHandyMan(
-      var customerid, var email, var name, var phone, var password) async {
+      var handyid, var email, var name, var phone, var password) async {
     try {
       String url = WebConfig.baseUrl +
           WebConfig.apisPath +
           WebConfig.updateAccountHandyMan;
       final response = await http.post(Uri.parse(url), body: {
-        "customer_id": customerid,
+        "handy_id": handyid,
         "email": email,
         "name": name,
         "phone": phone,
@@ -118,6 +117,23 @@ class _ProfileScreenState extends State<ProfileScreen> {
       log(response.body);
     } catch (e) {
       log("[updateAccountHandyMan] $e");
+    }
+  }
+
+  Future updateUserImageHandyMan(
+      var hanyManid, var image, var profileDecoded) async {
+    try {
+      String url = WebConfig.baseUrl +
+          WebConfig.apisPath +
+          WebConfig.updateHandyManImage;
+      final response = await http.post(Uri.parse(url), body: {
+        "hanyMan_id ": hanyManid,
+        "image": image,
+        "image_encoded": profileDecoded
+      });
+      log(response.body);
+    } catch (e) {
+      log("[updateUserImageHandyMan] $e");
     }
   }
 
@@ -275,7 +291,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                                 imageFile!.readAsBytesSync());
                                             imagepath =
                                                 imageFile!.path.split("/").last;
-                                            // updateImage(id!, imagepath, photo);
+                                            if (typeId == 1) {
+                                              updateUserImage(
+                                                  userId, imagepath, photo);
+                                            } else {
+                                              updateUserImageHandyMan(
+                                                  userId, imagepath, photo);
+                                            }
                                             imageCache!.clear();
                                           },
                                           child: const Icon(
