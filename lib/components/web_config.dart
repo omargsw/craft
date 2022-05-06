@@ -17,6 +17,7 @@ class WebConfig {
   static String updateAccount = '/updateAccount.php';
   static String updateUserImage = '/updateUserImage.php';
   static String updateAccountHandyMan = '/updateAccountHandyMan.php';
+  static String updateHandyManImage = '/updateHandyManImage.php';
   static String getRequests = '/getRequests.php';
   static String updateRequestForWho = '/updateRequestForWho.php';
   static String insertBill = '/insertBill.php';
