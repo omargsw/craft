@@ -94,6 +94,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       final response = await http.post(Uri.parse(url), body: {
         "customer_id": customerid,
         "image": image,
+        "image_encoded": profileDecoded,
       });
       log(response.body);
     } catch (e) {
