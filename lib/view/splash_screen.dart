@@ -13,10 +13,10 @@ class SplashScreen extends StatefulWidget {
 
 class _SplashScreenState extends State<SplashScreen> {
   bool time = false;
-var lat, long;
+  var lat, long;
   late Position cl;
 
-    Future getPer() async {
+  Future getPer() async {
     bool services;
     LocationPermission per;
     services = await Geolocator.isLocationServiceEnabled();
@@ -57,6 +57,7 @@ var lat, long;
     long = cl.longitude;
     setState(() {});
   }
+
   @override
   void initState() {
     super.initState();
@@ -73,12 +74,13 @@ var lat, long;
       backgroundColor: Colors.white,
       body: Container(
         width: width,
-        decoration: BoxDecoration(
-          image: DecorationImage(
-            image: AssetImage('assets/images/tools.jpg'),
-            fit: BoxFit.cover,
-          ),
-        ),
+        color: Colors.white,
+        // decoration: BoxDecoration(
+        //   image: DecorationImage(
+        //     image: AssetImage('assets/images/tools.jpg'),
+        //     fit: BoxFit.cover,
+        //   ),
+        // ),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [

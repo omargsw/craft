@@ -24,4 +24,7 @@ class WebConfig {
   static String getRequestsCustomer = '/getRequestsCustomer.php';
   static String getBills = '/getBills.php';
   static String cancelRequest = '/cancelRequest.php';
+  static String searchCategory = '/SearchCategory.php';
+  static String getPostByname = '/getPostByname.php';
+  static String handyManCatgeory = '/HandyManCatgeory.php';
 }

@@ -27,7 +27,7 @@ class _RequestsPageState extends State<RequestsPage> {
   int? typeId = sharedPreferences!.getInt('typeID');
   bool isLoading = false;
 
-  List<FetchRequests> requests = [];
+  List<FetchRequest> requests = [];
   Future fetchRequest() async {
     isLoading = true;
     try {
@@ -35,8 +35,8 @@ class _RequestsPageState extends State<RequestsPage> {
           WebConfig.baseUrl + WebConfig.apisPath + WebConfig.getRequests;
       final response = await http.get(Uri.parse(url));
       if (response.statusCode == 200) {
-        final List<FetchRequests> requestlist =
-            fetchRequestsFromJson(response.body);
+        final List<FetchRequest> requestlist =
+            fetchRequestFromJson(response.body);
         return requestlist;
       }
     } catch (e) {
@@ -125,129 +125,197 @@ class _RequestsPageState extends State<RequestsPage> {
     return Scaffold(
         backgroundColor: Colors.white,
         body: (typeId == 1)
-            ? ListView.builder(
-                itemCount: requestsCustomer.length,
-                itemBuilder: (context, index) {
-                  FetchRequestsToCustomer requestsCustomerApi =
-                      requestsCustomer[index];
-                  return Column(
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 5),
-                        child: Container(
-                          height: 90,
-                          width: width * 0.9,
-                          padding: const EdgeInsets.all(10),
-                          decoration: BoxDecoration(
-                            borderRadius:
-                                const BorderRadius.all(Radius.circular(16.0)),
-                            color: Colors.white,
-                            boxShadow: <BoxShadow>[
-                              BoxShadow(
-                                color: Colors.grey.withOpacity(0.8),
-                                offset: const Offset(4, 4),
-                                blurRadius: 5,
+            ? (isLoading)
+                ? Center(
+                    child: CircularProgressIndicator(
+                      color: AppColors.primaryColor,
+                    ),
+                  )
+                : ListView.builder(
+                    itemCount: requestsCustomer.length,
+                    itemBuilder: (context, index) {
+                      FetchRequestsToCustomer requestsCustomerApi =
+                          requestsCustomer[index];
+                      return Column(
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 5),
+                            child: Container(
+                              height: 90,
+                              width: width * 0.9,
+                              padding: const EdgeInsets.all(10),
+                              decoration: BoxDecoration(
+                                borderRadius: const BorderRadius.all(
+                                    Radius.circular(16.0)),
+                                color: Colors.white,
+                                boxShadow: <BoxShadow>[
+                                  BoxShadow(
+                                    color: Colors.grey.withOpacity(0.8),
+                                    offset: const Offset(4, 4),
+                                    blurRadius: 5,
+                                  ),
+                                ],
                               ),
-                            ],
-                          ),
-                          child: ListTile(
-                            contentPadding: const EdgeInsets.symmetric(
-                              horizontal: 5,
-                              vertical: 5,
-                            ),
-                            leading: CircleAvatar(
-                                radius: 23,
-                                backgroundImage: NetworkImage(
-                                    "https://ogsw.000webhostapp.com/Sanay3i/customerImages/" +
-                                        requestsCustomerApi.handyManImage)),
-                            trailing: Column(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                InkWell(
-                                  onTap: () {
-                                    showDialog<String>(
-                                        context: context,
-                                        builder: (BuildContext context) {
-                                          return AlertDialogWidget(
-                                              title:
-                                                  "Are you sure to cancel this request?",
-                                              onTapYes: () {
-                                                cancelRequest(
-                                                    requestsCustomerApi.id);
-                                                setState(() {
-                                                  fetchRequestsToCustomer().then(
-                                                      (requestcustomerlist) {
-                                                    setState(() {
-                                                      requestsCustomer =
-                                                          requestcustomerlist;
-                                                    });
-                                                  });
-                                                });
-                                                Get.back();
-                                              });
+                              child: ListTile(
+                                contentPadding: const EdgeInsets.symmetric(
+                                  horizontal: 5,
+                                  vertical: 5,
+                                ),
+                                leading: CircleAvatar(
+                                    radius: 23,
+                                    backgroundImage: NetworkImage(
+                                        "https://ogsw.000webhostapp.com/Sanay3i/customerImages/" +
+                                            requestsCustomerApi.handyManImage)),
+                                trailing: Column(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    InkWell(
+                                      onTap: () {
+                                        showDialog<String>(
+                                            context: context,
+                                            builder: (BuildContext context) {
+                                              return AlertDialog(
+                                                shape:
+                                                    const RoundedRectangleBorder(
+                                                        borderRadius:
+                                                            BorderRadius.all(
+                                                                Radius.circular(
+                                                                    20.0))),
+                                                backgroundColor: Colors.white,
+                                                content: SizedBox(
+                                                  height: 120,
+                                                  child: Column(
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment
+                                                            .center,
+                                                    children: [
+                                                      Text(
+                                                          "Are you sure to cancel this request?",
+                                                          textAlign:
+                                                              TextAlign.left,
+                                                          style: TextStyle(
+                                                            color: AppColors
+                                                                .primaryColor,
+                                                            fontSize: 20,
+                                                          )),
+                                                      const Padding(
+                                                        padding: EdgeInsets
+                                                            .symmetric(
+                                                                vertical: 20),
+                                                        child: Text(
+                                                            "You will have to pay a fine of 50 JOD",
+                                                            textAlign: TextAlign
+                                                                .center,
+                                                            style: TextStyle(
+                                                              color:
+                                                                  Colors.black,
+                                                            )),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ),
+                                                actions: <Widget>[
+                                                  TextButton(
+                                                    onPressed: () {
+                                                      Navigator.of(context)
+                                                          .pop();
+                                                    },
+                                                    child: Text('NO',
+                                                        style: TextStyle(
+                                                          color: AppColors
+                                                              .primaryColor,
+                                                        )),
+                                                  ),
+                                                  TextButton(
+                                                    onPressed: () {
+                                                      cancelRequest(
+                                                          requestsCustomerApi
+                                                              .id);
+                                                      setState(() {
+                                                        fetchRequestsToCustomer()
+                                                            .then(
+                                                                (requestcustomerlist) {
+                                                          setState(() {
+                                                            requestsCustomer =
+                                                                requestcustomerlist;
+                                                          });
+                                                        });
+                                                      });
+                                                      Get.back();
+                                                    },
+                                                    child: Text('YES',
+                                                        style: TextStyle(
+                                                          color: AppColors
+                                                              .primaryColor,
+                                                        )),
+                                                  ),
+                                                ],
+                                              );
+                                            });
+                                      },
+                                      child: Container(
+                                        width: 70,
+                                        height: 25,
+                                        decoration: BoxDecoration(
+                                            border: Border.all(
+                                                color: AppColors.primaryColor)),
+                                        child: const Center(
+                                          child: Text(
+                                            "Cancel",
+                                            style: TextStyle(color: Colors.red),
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                    InkWell(
+                                      onTap: () async {
+                                        print(requestsCustomerApi.id);
+                                        await fetchBills(requestsCustomerApi.id)
+                                            .then((billsList) {
+                                          setState(() {
+                                            bills = billsList;
+                                          });
                                         });
-                                  },
-                                  child: Container(
-                                    width: 70,
-                                    height: 25,
-                                    decoration: BoxDecoration(
-                                        border: Border.all(
-                                            color: AppColors.primaryColor)),
-                                    child: const Center(
-                                      child: Text(
-                                        "Cancel",
-                                        style: TextStyle(color: Colors.red),
+                                        showModelSheetBill(context);
+                                      },
+                                      child: Container(
+                                        width: 70,
+                                        height: 25,
+                                        decoration: BoxDecoration(
+                                            border: Border.all(
+                                                color: AppColors.primaryColor)),
+                                        child: const Center(
+                                          child: Text(
+                                            "View bill",
+                                            style:
+                                                TextStyle(color: Colors.blue),
+                                          ),
+                                        ),
                                       ),
                                     ),
-                                  ),
+                                  ],
                                 ),
-                                InkWell(
-                                  onTap: () async {
-                                    print(requestsCustomerApi.id);
-                                    await fetchBills(requestsCustomerApi.id)
-                                        .then((billsList) {
-                                      setState(() {
-                                        bills = billsList;
-                                      });
-                                    });
-                                    showModelSheetBill(context);
-                                  },
-                                  child: Container(
-                                    width: 70,
-                                    height: 25,
-                                    decoration: BoxDecoration(
-                                        border: Border.all(
-                                            color: AppColors.primaryColor)),
-                                    child: const Center(
-                                      child: Text(
-                                        "View bill",
-                                        style: TextStyle(color: Colors.blue),
-                                      ),
-                                    ),
-                                  ),
+                                title: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text("Name : ${requestsCustomerApi.name}",
+                                        style: AppFonts.tajawal16BlackW600),
+                                    Text("Phone : ${requestsCustomerApi.phone}",
+                                        style: AppFonts.tajawal16BlackW600),
+                                    const SizedBox(height: 4),
+                                    Text(requestsCustomerApi.status,
+                                        style: AppFonts.tajawal14PrimapryW600),
+                                  ],
                                 ),
-                              ],
-                            ),
-                            title: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text("Name : ${requestsCustomerApi.name}",
-                                    style: AppFonts.tajawal16BlackW600),
-                                Text("Phone : ${requestsCustomerApi.phone}",
-                                    style: AppFonts.tajawal16BlackW600),
-                                const SizedBox(height: 4),
-                                Text("Approved your request",
-                                    style: AppFonts.tajawal14PrimapryW600),
-                              ],
+                              ),
                             ),
                           ),
-                        ),
-                      ),
-                    ],
-                  );
-                },
-              )
-            : (requests.isEmpty || requests == null)
+                        ],
+                      );
+                    },
+                  )
+            : (isLoading)
                 ? Center(
                     child: CircularProgressIndicator(
                       color: AppColors.primaryColor,
@@ -256,7 +324,7 @@ class _RequestsPageState extends State<RequestsPage> {
                 : ListView.builder(
                     itemCount: requests.length,
                     itemBuilder: (context, index) {
-                      FetchRequests requestApi = requests[index];
+                      FetchRequest requestApi = requests[index];
                       return Column(
                         children: [
                           Padding(
@@ -282,16 +350,19 @@ class _RequestsPageState extends State<RequestsPage> {
                                   horizontal: 5,
                                   vertical: 5,
                                 ),
-                                leading: const CircleAvatar(
+                                leading: CircleAvatar(
                                     radius: 25,
-                                    backgroundImage: AssetImage(
-                                        "assets/images/nouserimage.jpg")),
+                                    backgroundImage: NetworkImage(
+                                      'https://ogsw.000webhostapp.com/Sanay3i/customerImages/' +
+                                          requestApi.customersImage,
+                                    )),
                                 trailing: TextButton(
                                   onPressed: () {
                                     Get.to(ApproveRequestsPage(
                                       name: requestApi.name,
                                       profileImage:
-                                          "assets/images/nouserimage.jpg",
+                                          'https://ogsw.000webhostapp.com/Sanay3i/customerImages/' +
+                                              requestApi.customersImage,
                                       phoneNumber: requestApi.phone,
                                       desc: requestApi.descrption,
                                       image: requestApi.image,
@@ -347,162 +418,177 @@ class _RequestsPageState extends State<RequestsPage> {
                     horizontal: 5,
                     vertical: 5,
                   ),
-                  child: ListView.builder(
-                    itemCount: bills.length,
-                    itemBuilder: (context, index) {
-                      FetchBills billsApi = bills[index];
-                      return Padding(
-                        padding: const EdgeInsets.symmetric(
-                            vertical: 20, horizontal: 20),
-                        child: Container(
-                          height: 300,
-                          width: MediaQuery.of(context).size.width * 0.9,
-                          padding: const EdgeInsets.all(10),
-                          decoration: BoxDecoration(
-                            borderRadius:
-                                const BorderRadius.all(Radius.circular(16.0)),
-                            color: AppColors.secondaryColor,
-                            boxShadow: <BoxShadow>[
-                              BoxShadow(
-                                color: Colors.grey.withOpacity(0.8),
-                                offset: const Offset(4, 4),
-                                blurRadius: 5,
-                              ),
-                            ],
-                          ),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Center(
-                                child: Text(
-                                  "Handy man details",
-                                  style: AppFonts.tajawal20PrimaryW600,
-                                ),
-                              ),
-                              Row(
-                                children: [
-                                  Text(
-                                    "Name : ",
-                                    style: AppFonts.tajawal16WhiteW600,
-                                  ),
-                                  Text(
-                                    billsApi.handyManName,
-                                    style: AppFonts.tajawal16BlackW600,
-                                  ),
-                                ],
-                              ),
-                              Row(
-                                children: [
-                                  Text(
-                                    "Phone number : ",
-                                    style: AppFonts.tajawal16WhiteW600,
-                                  ),
-                                  Text(
-                                    billsApi.handyManPhone,
-                                    style: AppFonts.tajawal16BlackW600,
-                                  ),
-                                ],
-                              ),
-                              const Divider(
-                                height: 20,
-                                thickness: 0,
-                                indent: 20,
-                                endIndent: 20,
-                                color: Colors.black,
-                              ),
-                              Padding(
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal: 30, vertical: 5),
-                                child: Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Text(
-                                      "Title",
-                                      style: AppFonts.tajawal16WhiteW600,
-                                    ),
-                                    const SizedBox(
-                                      width: 70,
-                                    ),
-                                    Text(
-                                      "Description",
-                                      style: AppFonts.tajawal16WhiteW600,
+                  child: (bills.isEmpty)
+                      ? const Center(
+                          child: Text(
+                          "No Result",
+                          style: TextStyle(color: Colors.grey, fontSize: 15),
+                        ))
+                      : ListView.builder(
+                          itemCount: bills.length,
+                          itemBuilder: (context, index) {
+                            FetchBills billsApi = bills[index];
+                            return Padding(
+                              padding: const EdgeInsets.symmetric(
+                                  vertical: 20, horizontal: 20),
+                              child: Container(
+                                height: 300,
+                                width: MediaQuery.of(context).size.width * 0.9,
+                                padding: const EdgeInsets.all(10),
+                                decoration: BoxDecoration(
+                                  borderRadius: const BorderRadius.all(
+                                      Radius.circular(16.0)),
+                                  color: AppColors.secondaryColor,
+                                  boxShadow: <BoxShadow>[
+                                    BoxShadow(
+                                      color: Colors.grey.withOpacity(0.8),
+                                      offset: const Offset(4, 4),
+                                      blurRadius: 5,
                                     ),
                                   ],
                                 ),
-                              ),
-                              Padding(
-                                padding:
-                                    const EdgeInsets.symmetric(horizontal: 15),
-                                child: Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    SizedBox(
-                                      width: MediaQuery.of(context).size.width *
-                                          0.3,
+                                    Center(
                                       child: Text(
-                                        billsApi.billTitle,
-                                        style: AppFonts.tajawal16BlackW600,
+                                        "Handy man details",
+                                        style: AppFonts.tajawal20PrimaryW600,
                                       ),
-                                    ),
-                                    SizedBox(
-                                      width: MediaQuery.of(context).size.width *
-                                          0.3,
-                                      child: Text(
-                                        billsApi.billDescription,
-                                        style: AppFonts.tajawal16BlackW600,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              const Spacer(),
-                              const Divider(
-                                height: 20,
-                                thickness: 0,
-                                indent: 20,
-                                endIndent: 20,
-                                color: Colors.black,
-                              ),
-                              Padding(
-                                padding:
-                                    const EdgeInsets.symmetric(horizontal: 15),
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Text(
-                                      "Total : ",
-                                      style: AppFonts.tajawal16WhiteW600,
                                     ),
                                     Row(
                                       children: [
                                         Text(
-                                          billsApi.price,
-                                          style: AppFonts.tajawal16BlackW600,
+                                          "Name : ",
+                                          style: AppFonts.tajawal16WhiteW600,
                                         ),
                                         Text(
-                                          " JOD",
-                                          style: AppFonts.tajawal16PrimapryW600,
+                                          billsApi.handyManName,
+                                          style: AppFonts.tajawal16BlackW600,
                                         ),
                                       ],
+                                    ),
+                                    Row(
+                                      children: [
+                                        Text(
+                                          "Phone number : ",
+                                          style: AppFonts.tajawal16WhiteW600,
+                                        ),
+                                        Text(
+                                          billsApi.handyManPhone,
+                                          style: AppFonts.tajawal16BlackW600,
+                                        ),
+                                      ],
+                                    ),
+                                    const Divider(
+                                      height: 20,
+                                      thickness: 0,
+                                      indent: 20,
+                                      endIndent: 20,
+                                      color: Colors.black,
+                                    ),
+                                    Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 30, vertical: 5),
+                                      child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          Text(
+                                            "Title",
+                                            style: AppFonts.tajawal16WhiteW600,
+                                          ),
+                                          const SizedBox(
+                                            width: 70,
+                                          ),
+                                          Text(
+                                            "Description",
+                                            style: AppFonts.tajawal16WhiteW600,
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                    Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 15),
+                                      child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          SizedBox(
+                                            width: MediaQuery.of(context)
+                                                    .size
+                                                    .width *
+                                                0.3,
+                                            child: Text(
+                                              billsApi.billTitle,
+                                              style:
+                                                  AppFonts.tajawal16BlackW600,
+                                            ),
+                                          ),
+                                          SizedBox(
+                                            width: MediaQuery.of(context)
+                                                    .size
+                                                    .width *
+                                                0.3,
+                                            child: Text(
+                                              billsApi.billDescription,
+                                              style:
+                                                  AppFonts.tajawal16BlackW600,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                    const Spacer(),
+                                    const Divider(
+                                      height: 20,
+                                      thickness: 0,
+                                      indent: 20,
+                                      endIndent: 20,
+                                      color: Colors.black,
+                                    ),
+                                    Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 15),
+                                      child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        children: [
+                                          Text(
+                                            "Total : ",
+                                            style: AppFonts.tajawal16WhiteW600,
+                                          ),
+                                          Row(
+                                            children: [
+                                              Text(
+                                                billsApi.price,
+                                                style:
+                                                    AppFonts.tajawal16BlackW600,
+                                              ),
+                                              Text(
+                                                " JOD",
+                                                style: AppFonts
+                                                    .tajawal16PrimapryW600,
+                                              ),
+                                            ],
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                    const Divider(
+                                      height: 20,
+                                      thickness: 0,
+                                      indent: 20,
+                                      endIndent: 20,
+                                      color: Colors.black,
                                     ),
                                   ],
                                 ),
                               ),
-                              const Divider(
-                                height: 20,
-                                thickness: 0,
-                                indent: 20,
-                                endIndent: 20,
-                                color: Colors.black,
-                              ),
-                            ],
-                          ),
-                        ),
-                      );
-                    },
-                  ));
+                            );
+                          },
+                        ));
             },
           );
         });

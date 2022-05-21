@@ -191,7 +191,7 @@ class _SignUpPageState extends State<SignUpPage> {
                         },
                         icon: iconpass2,
                       ),
-                      type: "pass",
+                      type: "",
                     ),
                   ],
                 )),
@@ -203,6 +203,7 @@ class _SignUpPageState extends State<SignUpPage> {
                 if (formName.currentState!.validate() &&
                     formEmail.currentState!.validate() &&
                     formPhone.currentState!.validate() &&
+                    formPass.currentState!.validate() &&
                     formPass2.currentState!.validate()) {
                   if (pass1.text == pass2.text) {
                     userSignUp(email.text, pass2.text, phone.text, name.text);

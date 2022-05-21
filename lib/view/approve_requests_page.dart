@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:developer';
 
+import 'package:craft/components/context.dart';
 import 'package:craft/components/font.dart';
 import 'package:craft/components/main_app_bar.dart';
 import 'package:craft/components/text_field_withColor.dart';
@@ -85,10 +86,9 @@ class _ApproveRequestsPageState extends State<ApproveRequestsPage> {
                   widget.phoneNumber!,
                   style: AppFonts.tajawal14Black45W400,
                 ),
-                leading: const CircleAvatar(
+                leading: CircleAvatar(
                     radius: 28,
-                    backgroundImage:
-                        AssetImage("assets/images/nouserimage.jpg")),
+                    backgroundImage: NetworkImage(widget.profileImage!)),
               ),
             ),
             Padding(

@@ -1,14 +1,13 @@
 import 'dart:convert';
 
-List<FetchRequests> fetchRequestsFromJson(String str) =>
-    List<FetchRequests>.from(
-        json.decode(str).map((x) => FetchRequests.fromJson(x)));
+List<FetchRequest> fetchRequestFromJson(String str) => List<FetchRequest>.from(
+    json.decode(str).map((x) => FetchRequest.fromJson(x)));
 
-String fetchRequestsToJson(List<FetchRequests> data) =>
+String fetchRequestToJson(List<FetchRequest> data) =>
     json.encode(List<dynamic>.from(data.map((x) => x.toJson())));
 
-class FetchRequests {
-  FetchRequests({
+class FetchRequest {
+  FetchRequest({
     required this.id,
     required this.longitude,
     required this.latitude,
@@ -18,6 +17,7 @@ class FetchRequests {
     required this.status,
     required this.name,
     required this.phone,
+    required this.customersImage,
   });
 
   final int id;
@@ -25,12 +25,13 @@ class FetchRequests {
   final double latitude;
   final String image;
   final String descrption;
-  final dynamic price;
+  final String price;
   final String status;
   final String name;
   final String phone;
+  final String customersImage;
 
-  factory FetchRequests.fromJson(Map<String, dynamic> json) => FetchRequests(
+  factory FetchRequest.fromJson(Map<String, dynamic> json) => FetchRequest(
         id: json["id"],
         longitude: json["longitude"].toDouble(),
         latitude: json["latitude"].toDouble(),
@@ -40,6 +41,7 @@ class FetchRequests {
         status: json["status"],
         name: json["name"],
         phone: json["phone"],
+        customersImage: json["customersImage"],
       );
 
   Map<String, dynamic> toJson() => {
@@ -52,5 +54,6 @@ class FetchRequests {
         "status": status,
         "name": name,
         "phone": phone,
+        "customersImage": customersImage,
       };
 }

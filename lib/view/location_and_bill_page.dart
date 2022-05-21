@@ -1,10 +1,12 @@
 import 'dart:developer';
 import 'package:craft/components/color.dart';
+import 'package:craft/components/context.dart';
 import 'package:craft/components/font.dart';
 import 'package:craft/components/main_app_bar.dart';
 import 'package:craft/components/primary_button.dart';
 import 'package:craft/components/text_field_withColor.dart';
 import 'package:craft/components/web_config.dart';
+import 'package:craft/view/nav_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
@@ -77,7 +79,97 @@ class _LocationAndBillPageState extends State<LocationAndBillPage> {
                           padding: const EdgeInsets.symmetric(vertical: 20),
                           child: InkWell(
                             onTap: () async {
-                              showModelSheetAddBill(context);
+                              showDialog<String>(
+                                  context: context,
+                                  builder: (BuildContext context) {
+                                    return AlertDialog(
+                                      shape: const RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.all(
+                                              Radius.circular(20.0))),
+                                      backgroundColor: Colors.white,
+                                      content: SizedBox(
+                                          height: MediaQuery.of(context)
+                                                  .size
+                                                  .height *
+                                              0.5,
+                                          child: Column(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.center,
+                                            children: [
+                                              //Explain what the problem is and how to solve it
+                                              Center(
+                                                child: Text(
+                                                  "Explain what the problem is and how to solve it",
+                                                  style: AppFonts
+                                                      .tajawal16Black45W400,
+                                                  textAlign: TextAlign.center,
+                                                ),
+                                              ),
+                                              const SizedBox(
+                                                height: 20,
+                                              ),
+                                              TextFieldWithColorWidget(
+                                                formKey: formtitle,
+                                                controller: titleController,
+                                                labelText: "Title",
+                                                inputType: TextInputType.text,
+                                                ob: false,
+                                                prefixIcon: null,
+                                                suffixIconButton: null,
+                                                type: "name",
+                                              ),
+                                              TextFieldWithColorWidget(
+                                                formKey: formdesc,
+                                                controller: descController,
+                                                labelText: "Description",
+                                                inputType: TextInputType.text,
+                                                ob: false,
+                                                prefixIcon: null,
+                                                suffixIconButton: null,
+                                                type: "name",
+                                              ),
+                                              Padding(
+                                                padding:
+                                                    const EdgeInsets.symmetric(
+                                                        vertical: 20),
+                                                child: InkWell(
+                                                  onTap: () async {
+                                                    if (formtitle.currentState!
+                                                            .validate() &&
+                                                        formdesc.currentState!
+                                                            .validate()) {
+                                                      insertBill(
+                                                        widget.requestId
+                                                            .toString(),
+                                                        widget.price,
+                                                        titleController.text,
+                                                        descController.text,
+                                                      );
+                                                      Contaxt().showDoneSnackBar(
+                                                          context,
+                                                          "Send Request Successfully");
+                                                      Get.back();
+                                                      Get.offAll(const NavBar(
+                                                          typeId: 2));
+                                                    }
+                                                  },
+                                                  child: PrimaryButton(
+                                                    title: "SEND",
+                                                    width:
+                                                        MediaQuery.of(context)
+                                                                .size
+                                                                .width *
+                                                            0.7,
+                                                    backgroundcolor: AppColors
+                                                        .secondaryColor,
+                                                    height: 50,
+                                                  ),
+                                                ),
+                                              ),
+                                            ],
+                                          )),
+                                    );
+                                  });
                               // insertBill(
                               //     requestid, price, "test", "test test test");
                             },
@@ -153,82 +245,5 @@ class _LocationAndBillPageState extends State<LocationAndBillPage> {
         ],
       ),
     );
-  }
-
-  void showModelSheetAddBill(BuildContext context) {
-    showMaterialModalBottomSheet(
-        context: context,
-        builder: (builder) {
-          return StatefulBuilder(
-            builder: (BuildContext context, StateSetter setModelState) {
-              return Container(
-                  height: MediaQuery.of(context).size.height * 0.5,
-                  width: MediaQuery.of(context).size.width,
-                  margin: const EdgeInsets.symmetric(
-                    horizontal: 5,
-                    vertical: 5,
-                  ),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      //Explain what the problem is and how to solve it
-                      Center(
-                        child: Text(
-                          "Explain what the problem is and how to solve it",
-                          style: AppFonts.tajawal16Black45W400,
-                          textAlign: TextAlign.center,
-                        ),
-                      ),
-                      const SizedBox(
-                        height: 20,
-                      ),
-                      TextFieldWithColorWidget(
-                        formKey: formtitle,
-                        controller: titleController,
-                        labelText: "Title",
-                        inputType: TextInputType.text,
-                        ob: false,
-                        prefixIcon: null,
-                        suffixIconButton: null,
-                        type: "name",
-                      ),
-                      TextFieldWithColorWidget(
-                        formKey: formdesc,
-                        controller: descController,
-                        labelText: "Description",
-                        inputType: TextInputType.text,
-                        ob: false,
-                        prefixIcon: null,
-                        suffixIconButton: null,
-                        type: "name",
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 20),
-                        child: InkWell(
-                          onTap: () async {
-                            if (formtitle.currentState!.validate() &&
-                                formdesc.currentState!.validate()) {
-                              insertBill(
-                                widget.requestId.toString(),
-                                widget.price,
-                                titleController.text,
-                                descController.text,
-                              );
-                              Get.back();
-                            }
-                          },
-                          child: PrimaryButton(
-                            title: "SEND",
-                            width: MediaQuery.of(context).size.width * 0.7,
-                            backgroundcolor: AppColors.secondaryColor,
-                            height: 50,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ));
-            },
-          );
-        });
   }
 }

@@ -1,6 +1,8 @@
+import 'dart:convert';
 import 'dart:developer';
 
 import 'package:craft/components/color.dart';
+import 'package:craft/components/data_search.dart';
 import 'package:craft/components/font.dart';
 import 'package:craft/components/web_config.dart';
 import 'package:craft/model/fetch_categories.dart';
@@ -38,6 +40,18 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
+  List searchCa = [];
+  List searchName = [];
+  Future searchCategory() async {
+    String url = WebConfig.baseUrl + WebConfig.apisPath + WebConfig.getCategory;
+    var response = await http.get(Uri.parse(url));
+    var responsebody = await jsonDecode(response.body);
+    for (int i = 0; i < responsebody.length; i++) {
+      searchCa.add(responsebody[i]);
+      searchName.add(responsebody[i]['name']);
+    }
+  }
+
   @override
   void initState() {
     super.initState();
@@ -46,6 +60,7 @@ class _HomePageState extends State<HomePage> {
         category = categories;
       });
     });
+    searchCategory();
   }
 
   @override
@@ -53,7 +68,20 @@ class _HomePageState extends State<HomePage> {
     double width = MediaQuery.of(context).size.width;
     return Scaffold(
       backgroundColor: Colors.white,
-      body: (category.isEmpty || category == null)
+      floatingActionButton: FloatingActionButton.extended(
+        backgroundColor: AppColors.primaryColor,
+        foregroundColor: Colors.black,
+        onPressed: () {
+          showSearch(
+              context: context, delegate: DateSearch(searchName, searchCa));
+        },
+        icon: const Icon(Icons.search),
+        label: Text(
+          'Search',
+          style: AppFonts.tajawal16BlackW600,
+        ),
+      ),
+      body: (isLoading)
           ? Center(
               child: CircularProgressIndicator(
                 color: AppColors.primaryColor,
@@ -107,10 +135,12 @@ class _HomePageState extends State<HomePage> {
                                 width: width,
                                 padding: const EdgeInsets.all(5),
                                 color: AppColors.primaryColor,
-                                child: Text(
-                                  categoryApi.name,
-                                  style: AppFonts.tajawal14WhiteW600,
-                                  textAlign: TextAlign.center,
+                                child: Center(
+                                  child: Text(
+                                    categoryApi.name,
+                                    style: AppFonts.tajawal14WhiteW600,
+                                    textAlign: TextAlign.center,
+                                  ),
                                 ),
                               )),
                             ],

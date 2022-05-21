@@ -1,11 +1,13 @@
 import 'dart:developer';
 import 'dart:io';
 import 'package:craft/components/color.dart';
+import 'package:craft/components/context.dart';
 import 'package:craft/components/font.dart';
 import 'package:craft/components/main_app_bar.dart';
 import 'package:craft/components/web_config.dart';
 import 'package:craft/main.dart';
 import 'package:craft/model/fetch_comment.dart';
+import 'package:craft/model/fetch_handyman.dart';
 import 'package:craft/model/fetch_post.dart';
 import 'package:craft/view/add_post.dart';
 import 'package:flutter/material.dart';
@@ -46,6 +48,7 @@ class _PostsPageState extends State<PostsPage> {
   String imagepath = '';
   var lat, long;
   late Position cl;
+  bool isSelect = false;
 
   Future chooseImage(ImageSource source) async {
     final pickedFile = await imagePicker.pickImage(source: source);
@@ -109,8 +112,8 @@ class _PostsPageState extends State<PostsPage> {
     try {
       String url = WebConfig.baseUrl +
           WebConfig.apisPath +
-          WebConfig.getPosts +
-          "?catID=${widget.categoryId}";
+          WebConfig.getPostByname +
+          "?name=${widget.titlePage}";
       final response = await http.get(Uri.parse(url));
       if (response.statusCode == 200) {
         final List<FetchPost> postList = fetchPostFromJson(response.body);
@@ -118,6 +121,26 @@ class _PostsPageState extends State<PostsPage> {
       }
     } catch (e) {
       log("[FetshPost] $e");
+    } finally {
+      isLoading = false;
+    }
+  }
+
+  List<GetHandyMan> handy = [];
+  Future fetchHanyMan() async {
+    isLoading = true;
+    try {
+      String url = WebConfig.baseUrl +
+          WebConfig.apisPath +
+          WebConfig.handyManCatgeory +
+          "?name=${widget.titlePage}";
+      final response = await http.get(Uri.parse(url));
+      if (response.statusCode == 200) {
+        final List<GetHandyMan> list = getHandyManFromJson(response.body);
+        return list;
+      }
+    } catch (e) {
+      log("[fetchHanyMan] $e");
     } finally {
       isLoading = false;
     }
@@ -160,7 +183,7 @@ class _PostsPageState extends State<PostsPage> {
   }
 
   Future insertRequest(var customerid, var longitude, var latitude, var image,
-      var descrption) async {
+      var descrption, var handyID) async {
     try {
       String url =
           WebConfig.baseUrl + WebConfig.apisPath + WebConfig.insertRequest;
@@ -170,6 +193,7 @@ class _PostsPageState extends State<PostsPage> {
         "latitude": latitude,
         "image": image,
         "descrption": descrption,
+        "handyID": handyID
       });
       log(response.body);
     } catch (e) {
@@ -217,8 +241,12 @@ class _PostsPageState extends State<PostsPage> {
         posts = postList;
       });
     });
+    fetchHanyMan().then((list) {
+      setState(() {
+        handy = list;
+      });
+    });
     getPer();
-    getLateAndLang();
   }
 
   @override
@@ -241,290 +269,312 @@ class _PostsPageState extends State<PostsPage> {
               ),
             )
           : Container(),
-      body: (posts.isEmpty || posts == null)
+      body: (isLoading)
           ? Center(
               child: CircularProgressIndicator(
                 color: AppColors.primaryColor,
               ),
             )
-          : ListView.builder(
-              itemCount: posts.length,
-              itemBuilder: (context, index) {
-                FetchPost postApi = posts[index];
-                return Card(
-                  color: Colors.white38,
-                  clipBehavior: Clip.antiAlias,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      ListTile(
-                        leading: ClipOval(
-                          child: Image.network(
-                            WebConfig.baseUrl +
-                                WebConfig.apisPath +
-                                '/customerImages/' +
-                                postApi.userImage,
-                            width: 50,
-                            height: 50,
-                            fit: BoxFit.cover,
-                          ),
-                        ),
-                        title: Text(postApi.name),
-                        subtitle: Text(
-                          "${postApi.createdAt.day}-${postApi.createdAt.month}-${postApi.createdAt.year}",
-                          style:
-                              TextStyle(color: Colors.black.withOpacity(0.6)),
-                        ),
-                        trailing: (postApi.userId == userId)
-                            ? PopupMenuButton(
-                                icon: const Icon(
-                                  Icons.more_vert,
-                                  color: Colors.black,
-                                ),
-                                iconSize: 30,
-                                itemBuilder: (BuildContext context) =>
-                                    <PopupMenuEntry>[
-                                  PopupMenuItem(
-                                    child: ListTile(
-                                      title: Text(
-                                        'Edit',
-                                        style: AppFonts.tajawal14BlackW600,
-                                      ),
-                                      leading: const Icon(
-                                        Icons.edit,
-                                        color: Colors.blue,
-                                      ),
-                                      onTap: () {
-                                        showDialog<String>(
-                                            context: context,
-                                            builder: (BuildContext context) {
-                                              return AlertDialog(
-                                                shape:
-                                                    const RoundedRectangleBorder(
+          : (posts.isEmpty)
+              ? const Center(
+                  child: Text(
+                  "No Result",
+                  style: TextStyle(color: Colors.grey, fontSize: 15),
+                ))
+              : ListView.builder(
+                  itemCount: posts.length,
+                  itemBuilder: (context, index) {
+                    FetchPost postApi = posts[index];
+                    return Card(
+                      color: Colors.white38,
+                      clipBehavior: Clip.antiAlias,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          ListTile(
+                            leading: ClipOval(
+                              child: Image.network(
+                                WebConfig.baseUrl +
+                                    WebConfig.apisPath +
+                                    '/customerImages/' +
+                                    postApi.userImage,
+                                width: 50,
+                                height: 50,
+                                fit: BoxFit.cover,
+                              ),
+                            ),
+                            title: Text(postApi.name),
+                            subtitle: Text(
+                              "${postApi.createdAt.day}-${postApi.createdAt.month}-${postApi.createdAt.year}",
+                              style: TextStyle(
+                                  color: Colors.black.withOpacity(0.6)),
+                            ),
+                            trailing: (postApi.userId == userId)
+                                ? PopupMenuButton(
+                                    icon: const Icon(
+                                      Icons.more_vert,
+                                      color: Colors.black,
+                                    ),
+                                    iconSize: 30,
+                                    itemBuilder: (BuildContext context) =>
+                                        <PopupMenuEntry>[
+                                      PopupMenuItem(
+                                        child: ListTile(
+                                          title: Text(
+                                            'Edit',
+                                            style: AppFonts.tajawal14BlackW600,
+                                          ),
+                                          leading: const Icon(
+                                            Icons.edit,
+                                            color: Colors.blue,
+                                          ),
+                                          onTap: () {
+                                            showDialog<String>(
+                                                context: context,
+                                                builder:
+                                                    (BuildContext context) {
+                                                  return AlertDialog(
+                                                    shape: const RoundedRectangleBorder(
                                                         borderRadius:
                                                             BorderRadius.all(
                                                                 Radius.circular(
                                                                     20.0))),
-                                                backgroundColor: Colors.white,
-                                                content: Form(
-                                                  key: formEdit,
-                                                  child: Container(
-                                                    padding:
-                                                        const EdgeInsets.all(
-                                                            20),
-                                                    child: TextFormField(
-                                                      keyboardType:
-                                                          TextInputType.name,
-                                                      maxLines: 5,
-                                                      decoration:
-                                                          InputDecoration(
-                                                        contentPadding:
+                                                    backgroundColor:
+                                                        Colors.white,
+                                                    content: Form(
+                                                      key: formEdit,
+                                                      child: Container(
+                                                        padding:
                                                             const EdgeInsets
-                                                                    .fromLTRB(
-                                                                15, 5, 15, 5),
-                                                        hintText: 'Description',
-                                                        hintStyle:
-                                                            const TextStyle(
-                                                                fontSize: 10,
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .bold),
-                                                        fillColor:
-                                                            Colors.black12,
-                                                        filled: true,
-                                                        border:
-                                                            OutlineInputBorder(
-                                                          borderRadius:
-                                                              BorderRadius
-                                                                  .circular(
-                                                                      10.0),
-                                                          borderSide:
-                                                              BorderSide.none,
+                                                                .all(20),
+                                                        child: TextFormField(
+                                                          keyboardType:
+                                                              TextInputType
+                                                                  .name,
+                                                          maxLines: 5,
+                                                          decoration:
+                                                              InputDecoration(
+                                                            contentPadding:
+                                                                const EdgeInsets
+                                                                        .fromLTRB(
+                                                                    15,
+                                                                    5,
+                                                                    15,
+                                                                    5),
+                                                            hintText:
+                                                                'Description',
+                                                            hintStyle:
+                                                                const TextStyle(
+                                                                    fontSize:
+                                                                        10,
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .bold),
+                                                            fillColor:
+                                                                Colors.black12,
+                                                            filled: true,
+                                                            border:
+                                                                OutlineInputBorder(
+                                                              borderRadius:
+                                                                  BorderRadius
+                                                                      .circular(
+                                                                          10.0),
+                                                              borderSide:
+                                                                  BorderSide
+                                                                      .none,
+                                                            ),
+                                                          ),
+                                                          validator: (value) {
+                                                            if (value!
+                                                                .isEmpty) {
+                                                              return "Required";
+                                                            }
+                                                            return null;
+                                                          },
+                                                          controller: descEdit,
                                                         ),
                                                       ),
-                                                      validator: (value) {
-                                                        if (value!.isEmpty) {
-                                                          return "Required";
-                                                        }
-                                                        return null;
-                                                      },
-                                                      controller: descEdit,
                                                     ),
-                                                  ),
-                                                ),
-                                                actions: <Widget>[
-                                                  TextButton(
-                                                    onPressed: () {
-                                                      Get.back();
-                                                    },
-                                                    child: Text('Cancel',
-                                                        style: TextStyle(
-                                                          color: AppColors
-                                                              .primaryColor,
-                                                        )),
-                                                  ),
-                                                  TextButton(
-                                                    onPressed: () {
-                                                      if (formEdit.currentState!
-                                                          .validate()) {
-                                                        editPost(postApi.postId,
-                                                            descEdit.text);
-                                                        fetchPost()
-                                                            .then((postList) {
-                                                          setState(() {
-                                                            posts = postList;
-                                                          });
-                                                        });
-                                                        descEdit.clear();
-                                                        Get.back();
-                                                      }
-                                                    },
-                                                    child: Text('Save',
-                                                        style: TextStyle(
-                                                          color: AppColors
-                                                              .primaryColor,
-                                                        )),
-                                                  ),
-                                                ],
-                                              );
-                                            });
-                                      },
-                                    ),
-                                  ),
-                                  const PopupMenuDivider(),
-                                  PopupMenuItem(
-                                    child: ListTile(
-                                      title: Text(
-                                        'Delete',
-                                        style: AppFonts.tajawal14BlackW600,
+                                                    actions: <Widget>[
+                                                      TextButton(
+                                                        onPressed: () {
+                                                          Get.back();
+                                                        },
+                                                        child: Text('Cancel',
+                                                            style: TextStyle(
+                                                              color: AppColors
+                                                                  .primaryColor,
+                                                            )),
+                                                      ),
+                                                      TextButton(
+                                                        onPressed: () {
+                                                          if (formEdit
+                                                              .currentState!
+                                                              .validate()) {
+                                                            editPost(
+                                                                postApi.postId,
+                                                                descEdit.text);
+                                                            fetchPost().then(
+                                                                (postList) {
+                                                              setState(() {
+                                                                posts =
+                                                                    postList;
+                                                              });
+                                                            });
+                                                            descEdit.clear();
+                                                            Get.back();
+                                                          }
+                                                        },
+                                                        child: Text('Save',
+                                                            style: TextStyle(
+                                                              color: AppColors
+                                                                  .primaryColor,
+                                                            )),
+                                                      ),
+                                                    ],
+                                                  );
+                                                });
+                                          },
+                                        ),
                                       ),
-                                      leading: const Icon(
-                                        Icons.delete,
-                                        color: Colors.red,
-                                      ),
-                                      onTap: () async {
-                                        showDialog<String>(
-                                            context: context,
-                                            builder: (BuildContext context) {
-                                              return AlertDialog(
-                                                shape:
-                                                    const RoundedRectangleBorder(
+                                      const PopupMenuDivider(),
+                                      PopupMenuItem(
+                                        child: ListTile(
+                                          title: Text(
+                                            'Delete',
+                                            style: AppFonts.tajawal14BlackW600,
+                                          ),
+                                          leading: const Icon(
+                                            Icons.delete,
+                                            color: Colors.red,
+                                          ),
+                                          onTap: () async {
+                                            showDialog<String>(
+                                                context: context,
+                                                builder:
+                                                    (BuildContext context) {
+                                                  return AlertDialog(
+                                                    shape: const RoundedRectangleBorder(
                                                         borderRadius:
                                                             BorderRadius.all(
                                                                 Radius.circular(
                                                                     20.0))),
-                                                backgroundColor: Colors.white,
-                                                content: Text(
-                                                    'Are you sure to delete this post',
-                                                    textAlign: TextAlign.left,
-                                                    style: TextStyle(
-                                                      color: AppColors
-                                                          .primaryColor,
-                                                    )),
-                                                actions: <Widget>[
-                                                  TextButton(
-                                                    onPressed: () {
-                                                      Get.back();
-                                                    },
-                                                    child: Text('Cancel',
+                                                    backgroundColor:
+                                                        Colors.white,
+                                                    content: Text(
+                                                        'Are you sure to delete this post',
+                                                        textAlign:
+                                                            TextAlign.left,
                                                         style: TextStyle(
                                                           color: AppColors
                                                               .primaryColor,
                                                         )),
-                                                  ),
-                                                  TextButton(
-                                                    onPressed: () async {
-                                                      await deletePost(
-                                                          postApi.postId);
-                                                      fetchPost()
-                                                          .then((postList) {
-                                                        setState(() {
-                                                          posts = postList;
-                                                        });
-                                                      });
-                                                      Get.back();
-                                                    },
-                                                    child: Text('Delete',
-                                                        style: TextStyle(
-                                                          color: AppColors
-                                                              .primaryColor,
-                                                        )),
-                                                  ),
-                                                ],
-                                              );
-                                            });
-                                      },
-                                    ),
+                                                    actions: <Widget>[
+                                                      TextButton(
+                                                        onPressed: () {
+                                                          Get.back();
+                                                        },
+                                                        child: Text('Cancel',
+                                                            style: TextStyle(
+                                                              color: AppColors
+                                                                  .primaryColor,
+                                                            )),
+                                                      ),
+                                                      TextButton(
+                                                        onPressed: () async {
+                                                          await deletePost(
+                                                              postApi.postId);
+                                                          fetchPost()
+                                                              .then((postList) {
+                                                            setState(() {
+                                                              posts = postList;
+                                                            });
+                                                          });
+                                                          Get.back();
+                                                        },
+                                                        child: Text('Delete',
+                                                            style: TextStyle(
+                                                              color: AppColors
+                                                                  .primaryColor,
+                                                            )),
+                                                      ),
+                                                    ],
+                                                  );
+                                                });
+                                          },
+                                        ),
+                                      ),
+                                    ],
+                                  )
+                                : const SizedBox(
+                                    height: 0,
                                   ),
-                                ],
-                              )
-                            : const SizedBox(
-                                height: 0,
-                              ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 20, vertical: 10),
-                        child: Text(
-                          postApi.description,
-                          style:
-                              TextStyle(color: Colors.black.withOpacity(0.6)),
-                        ),
-                      ),
-                      Center(
-                        child: Image.network(WebConfig.baseUrl +
-                            WebConfig.apisPath +
-                            '/postImages/' +
-                            postApi.postImage),
-                      ),
-                      ButtonBar(
-                        alignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          TextButton.icon(
-                            onPressed: () async {
-                              await fetchComment(postApi.postId)
-                                  .then((commentList) {
-                                setState(() {
-                                  comments = commentList;
-                                });
-                              });
-                              showModelSheetComments(context, postApi.postId);
-                            },
-                            label: Text(
-                              'Comment',
-                              style: AppFonts.tajawal16PrimapryW600,
-                            ),
-                            icon: Icon(
-                              Icons.mode_comment_outlined,
-                              color: AppColors.primaryColor,
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 20, vertical: 10),
+                            child: Text(
+                              postApi.description,
+                              style: TextStyle(
+                                  color: Colors.black.withOpacity(0.6)),
                             ),
                           ),
-                          (typeId == 1)
-                              ? (postApi.userId == userId)
-                                  ? TextButton(
-                                      onPressed: () {
-                                        showModelSheetContactUs(
-                                          context,
-                                          postApi.name,
-                                          postApi.phone,
-                                          postApi.description,
-                                          postApi.postImage,
-                                        );
-                                      },
-                                      child: Text(
-                                        'Connect with us',
-                                        style: AppFonts.tajawal16PrimapryW600,
-                                      ),
-                                    )
-                                  : Container()
-                              : Container(),
+                          Center(
+                            child: Image.network(WebConfig.baseUrl +
+                                WebConfig.apisPath +
+                                '/postImages/' +
+                                postApi.postImage),
+                          ),
+                          ButtonBar(
+                            alignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              TextButton.icon(
+                                onPressed: () async {
+                                  await fetchComment(postApi.postId)
+                                      .then((commentList) {
+                                    setState(() {
+                                      comments = commentList;
+                                    });
+                                  });
+                                  showModelSheetComments(
+                                      context, postApi.postId);
+                                },
+                                label: Text(
+                                  'Comment',
+                                  style: AppFonts.tajawal16PrimapryW600,
+                                ),
+                                icon: Icon(
+                                  Icons.mode_comment_outlined,
+                                  color: AppColors.primaryColor,
+                                ),
+                              ),
+                              (typeId == 1)
+                                  ? (postApi.userId == userId)
+                                      ? TextButton(
+                                          onPressed: () {
+                                            showModelSheetContactUs(
+                                              context,
+                                              postApi.name,
+                                              postApi.phone,
+                                              postApi.description,
+                                              postApi.postImage,
+                                            );
+                                          },
+                                          child: Text(
+                                            'Connect with us',
+                                            style:
+                                                AppFonts.tajawal16PrimapryW600,
+                                          ),
+                                        )
+                                      : Container()
+                                  : Container(),
+                            ],
+                          ),
                         ],
                       ),
-                    ],
-                  ),
-                );
-              },
-            ),
+                    );
+                  },
+                ),
     );
   }
 
@@ -533,7 +583,7 @@ class _PostsPageState extends State<PostsPage> {
         context: context,
         builder: (builder) {
           return StatefulBuilder(
-            builder: (BuildContext context, StateSetter setModelState) {
+            builder: (BuildContext context, StateSetter setState) {
               return Container(
                 height: MediaQuery.of(context).size.height * 0.8,
                 width: MediaQuery.of(context).size.width,
@@ -543,23 +593,8 @@ class _PostsPageState extends State<PostsPage> {
                 ),
                 child: Stack(
                   children: [
-                    Align(
-                      alignment: Alignment.topCenter,
-                      child: Container(
-                        decoration: const BoxDecoration(
-                          borderRadius: BorderRadius.only(
-                            topRight: Radius.circular(10),
-                            topLeft: Radius.circular(10),
-                          ),
-                        ),
-                        child: Text(
-                          "Comments",
-                          style: AppFonts.tajawal25PrimaryW600,
-                        ),
-                      ),
-                    ),
                     Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 20),
+                      padding: const EdgeInsets.symmetric(vertical: 25),
                       child: ListView.builder(
                         itemCount: comments.length,
                         itemBuilder: (context, index) {
@@ -824,7 +859,7 @@ class _PostsPageState extends State<PostsPage> {
                       ),
                     ),
                     Align(
-                      alignment: Alignment.bottomCenter,
+                      alignment: Alignment.topCenter,
                       child: Container(
                         decoration: const BoxDecoration(
                           borderRadius: BorderRadius.only(
@@ -901,13 +936,14 @@ class _PostsPageState extends State<PostsPage> {
         });
   }
 
+  var selecteditem = null;
   void showModelSheetContactUs(BuildContext context, String name, String phone,
       String desc, String image) {
     showMaterialModalBottomSheet(
         context: context,
         builder: (builder) {
           return StatefulBuilder(
-            builder: (BuildContext context, StateSetter setModelState) {
+            builder: (BuildContext context, StateSetter setState) {
               return Container(
                 height: MediaQuery.of(context).size.height * 0.65,
                 width: MediaQuery.of(context).size.width,
@@ -931,13 +967,82 @@ class _PostsPageState extends State<PostsPage> {
                     ),
                     Center(
                       child: SizedBox(
-                        height: MediaQuery.of(context).size.height * 0.4,
+                        height: MediaQuery.of(context).size.height * 0.35,
                         child: Image.network(WebConfig.baseUrl +
                             WebConfig.apisPath +
                             '/postImages/' +
                             image),
                       ),
                     ),
+                    !isSelect
+                        ? Container()
+                        : const Text(
+                            "*You must select the handyman*",
+                            style: TextStyle(color: Colors.red, fontSize: 15),
+                          ),
+                    DecoratedBox(
+                        decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(10),
+                            boxShadow: [
+                              BoxShadow(
+                                  color: Colors.grey.withOpacity(0.4),
+                                  blurRadius: 20,
+                                  offset: const Offset(1, 2))
+                            ]),
+                        child: Padding(
+                          padding: const EdgeInsets.only(
+                              left: 10, right: 10, top: 10, bottom: 10),
+                          child: DropdownButton<String>(
+                            hint: Text(
+                              "Select the Handyman",
+                              style: AppFonts.tajawal14BlackW600,
+                            ),
+                            isExpanded: true,
+                            underline: Container(),
+                            value: selecteditem,
+                            icon: const Icon(
+                              Icons.keyboard_arrow_down_outlined,
+                              color: Colors.black,
+                            ),
+                            elevation: 16,
+                            style: AppFonts.tajawal14BlackW600,
+                            onChanged: (newValue) {
+                              setState(() {
+                                selecteditem = newValue;
+                              });
+                            },
+                            items: handy.map((info) {
+                              return DropdownMenuItem(
+                                value: info.id.toString(),
+                                child: Row(
+                                  children: [
+                                    ClipOval(
+                                      child: Image.network(
+                                        'https://ogsw.000webhostapp.com/Sanay3i/customerImages/' +
+                                            info.image.toString(),
+                                        width: 45,
+                                        height: 45,
+                                        fit: BoxFit.cover,
+                                      ),
+                                    ),
+                                    const SizedBox(
+                                      width: 20,
+                                    ),
+                                    Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        Text(info.handyManName),
+                                        Text(info.phone),
+                                      ],
+                                    )
+                                  ],
+                                ),
+                              );
+                            }).toList(),
+                          ),
+                        )),
                     const Spacer(),
                     Padding(
                       padding: const EdgeInsets.all(20.0),
@@ -945,9 +1050,26 @@ class _PostsPageState extends State<PostsPage> {
                         backgroundColor: AppColors.primaryColor,
                         foregroundColor: Colors.black,
                         onPressed: () async {
-                          //TODO: add lat / long
-                          await insertRequest(userId.toString(), lat.toString(),
-                              long.toString(), image, desc);
+                          if (selecteditem == null) {
+                            setState((() {
+                              isSelect = true;
+                            }));
+                          } else {
+                            setState((() {
+                              isSelect = false;
+                            }));
+                            await insertRequest(
+                              userId.toString(),
+                              lat.toString(),
+                              long.toString(),
+                              image,
+                              desc,
+                              selecteditem.toString(),
+                            );
+                            Get.back();
+                            Contaxt()
+                                .showDoneSnackBar(context, "Send Successfully");
+                          }
                         },
                         label: Row(
                           children: [

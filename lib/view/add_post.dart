@@ -10,7 +10,9 @@ import 'package:craft/components/primary_button.dart';
 import 'package:craft/components/web_config.dart';
 import 'package:craft/main.dart';
 import 'package:craft/model/fetch_categories.dart';
+import 'package:craft/view/nav_bar.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:http/http.dart' as http;
 
@@ -148,15 +150,17 @@ class _AddPostState extends State<AddPost> {
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
         child: InkWell(
           onTap: () async {
-            imagebase64 = base64Encode(imageFile!.readAsBytesSync());
-            imagepath = imageFile!.path.split("/").last;
             if (form.currentState!.validate()) {
               if (selectedCategory != null) {
                 if (imageFile != null) {
+                  imagebase64 = base64Encode(imageFile!.readAsBytesSync());
+                  imagepath = imageFile!.path.split("/").last;
                   insertPost(imagepath, imagebase64, userId.toString(),
                       desc.text, selectedCategory.toString());
-                  Contaxt().showDoneSnackBar(context, "Post added");
+                  Contaxt()
+                      .showDoneSnackBar(context, "Post added Successfully");
                   imageCache!.clear();
+                  Get.offAll(const NavBar(typeId: 1));
                 } else {
                   Contaxt().showErrorSnackBar(context, "You must upload image");
                 }

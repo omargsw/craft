@@ -83,8 +83,10 @@ class TextFieldWidget extends StatelessWidget {
                 return "Phone number must be 10 numbers";
               }
             } else if (type == "pass") {
-              if (value.length < 6) {
-                return "Password must be greater than or equal 6 characters";
+              if (!RegExp(
+                      r'^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[!@#\$&*~]).{8,15}$')
+                  .hasMatch(value)) {
+                return "The password must contain : \n *More than 8 and less than 15 characters \n *Upper case \n *lowercase \n *Numeric Number \n *Symbols (! @ # \$ & * ~)";
               }
             }
             return null;
