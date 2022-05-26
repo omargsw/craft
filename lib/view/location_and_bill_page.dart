@@ -37,6 +37,8 @@ class _LocationAndBillPageState extends State<LocationAndBillPage> {
   TextEditingController titleController = TextEditingController();
   GlobalKey<FormState> formdesc = GlobalKey<FormState>();
   TextEditingController descController = TextEditingController();
+  GlobalKey<FormState> formPrice = GlobalKey<FormState>();
+  TextEditingController priceController = TextEditingController();
 
   Future insertBill(
       var requestid, var totalprice, var title, var description) async {
@@ -91,7 +93,7 @@ class _LocationAndBillPageState extends State<LocationAndBillPage> {
                                           height: MediaQuery.of(context)
                                                   .size
                                                   .height *
-                                              0.5,
+                                              0.6,
                                           child: Column(
                                             mainAxisAlignment:
                                                 MainAxisAlignment.center,
@@ -123,6 +125,16 @@ class _LocationAndBillPageState extends State<LocationAndBillPage> {
                                                 controller: descController,
                                                 labelText: "Description",
                                                 inputType: TextInputType.text,
+                                                ob: false,
+                                                prefixIcon: null,
+                                                suffixIconButton: null,
+                                                type: "name",
+                                              ),
+                                              TextFieldWithColorWidget(
+                                                formKey: formPrice,
+                                                controller: priceController,
+                                                labelText: "Price",
+                                                inputType: TextInputType.phone,
                                                 ob: false,
                                                 prefixIcon: null,
                                                 suffixIconButton: null,

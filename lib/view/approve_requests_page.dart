@@ -109,32 +109,20 @@ class _ApproveRequestsPageState extends State<ApproveRequestsPage> {
             const SizedBox(
               height: 20,
             ),
-            TextFieldWithColorWidget(
-              formKey: formPrice,
-              controller: priceController,
-              labelText: "Price",
-              inputType: TextInputType.phone,
-              ob: false,
-              prefixIcon: null,
-              suffixIconButton: null,
-              type: "name",
-            ),
             Padding(
               padding: const EdgeInsets.all(20.0),
               child: FloatingActionButton.extended(
                 backgroundColor: Colors.green,
                 foregroundColor: Colors.black,
                 onPressed: () {
-                  if (formPrice.currentState!.validate()) {
-                    updateupdateRequestForWho(widget.requestid.toString(),
-                        userId.toString(), priceController.text);
-                    Get.to(LocationAndBillPage(
-                      lat: widget.lat,
-                      long: widget.long,
-                      requestId: widget.requestid!,
-                      price: priceController.text,
-                    ));
-                  }
+                  updateupdateRequestForWho(widget.requestid.toString(),
+                      userId.toString(), priceController.text);
+                  Get.to(LocationAndBillPage(
+                    lat: widget.lat,
+                    long: widget.long,
+                    requestId: widget.requestid!,
+                    price: priceController.text,
+                  ));
                 },
                 label: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 50),

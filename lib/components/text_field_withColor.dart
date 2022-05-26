@@ -1,6 +1,7 @@
 import 'package:craft/components/color.dart';
 import 'package:craft/components/font.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 class TextFieldWithColorWidget extends StatelessWidget {
   final GlobalKey<FormState>? formKey;
@@ -33,6 +34,11 @@ class TextFieldWithColorWidget extends StatelessWidget {
           style: TextStyle(color: AppColors.primaryColor),
           cursorColor: Colors.white,
           keyboardType: inputType,
+          inputFormatters: labelText == "Price"
+              ? [
+                  FilteringTextInputFormatter.digitsOnly,
+                ]
+              : [],
           decoration: InputDecoration(
             prefixIcon: prefixIcon,
             suffixIcon: suffixIconButton,

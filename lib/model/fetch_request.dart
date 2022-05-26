@@ -37,7 +37,7 @@ class FetchRequest {
         latitude: json["latitude"].toDouble(),
         image: json["image"],
         descrption: json["descrption"],
-        price: json["price"],
+        price: json["price"] == null ? "" : json["price"],
         status: json["status"],
         name: json["name"],
         phone: json["phone"],

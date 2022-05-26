@@ -1015,29 +1015,42 @@ class _PostsPageState extends State<PostsPage> {
                             items: handy.map((info) {
                               return DropdownMenuItem(
                                 value: info.id.toString(),
-                                child: Row(
-                                  children: [
-                                    ClipOval(
-                                      child: Image.network(
-                                        'https://ogsw.000webhostapp.com/Sanay3i/customerImages/' +
-                                            info.image.toString(),
-                                        width: 45,
-                                        height: 45,
-                                        fit: BoxFit.cover,
+                                child: Container(
+                                  height: 100,
+                                  child: Row(
+                                    children: [
+                                      ClipOval(
+                                        child: Image.network(
+                                          'https://ogsw.000webhostapp.com/Sanay3i/customerImages/' +
+                                              info.image.toString(),
+                                          width: 45,
+                                          height: 45,
+                                          fit: BoxFit.cover,
+                                        ),
                                       ),
-                                    ),
-                                    const SizedBox(
-                                      width: 20,
-                                    ),
-                                    Column(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      children: [
-                                        Text(info.handyManName),
-                                        Text(info.phone),
-                                      ],
-                                    )
-                                  ],
+                                      const SizedBox(
+                                        width: 20,
+                                      ),
+                                      Column(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Row(
+                                            children: [
+                                              Text(info.handyManName),
+                                              const SizedBox(
+                                                width: 20,
+                                              ),
+                                              Text(info.phone),
+                                            ],
+                                          ),
+                                          Text(info.descrption),
+                                        ],
+                                      )
+                                    ],
+                                  ),
                                 ),
                               );
                             }).toList(),
